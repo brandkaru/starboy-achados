@@ -581,66 +581,21 @@ export default function Admin({ looks, setLooks }) {
                     )}
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                    {/* Piece Title */}
-                    <div>
-                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                        NOME DA PEÇA
-                      </label>
-                      <input 
-                        type="text" 
-                        placeholder="Ex: Calça Track Pants COURAGEOUS"
-                        value={piece.title}
-                        onChange={(e) => updatePieceField(index, 'title', e.target.value)}
-                        required
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          background: 'rgba(15,15,20,0.8)',
-                          border: '1px solid var(--border-light)',
-                          borderRadius: 'var(--radius-sm)',
-                          color: '#ffffff',
-                          fontSize: '0.85rem'
-                        }}
-                      />
-                    </div>
-
-                    {/* Shein Code / ID */}
-                    <div>
-                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                        CÓDIGO/ID SHEIN (ex: NQF5PV7)
-                      </label>
-                      <input 
-                        type="text" 
-                        placeholder="Ex: NQF5PV7"
-                        value={piece.sheinCode}
-                        onChange={(e) => updatePieceField(index, 'sheinCode', e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          background: 'rgba(15,15,20,0.8)',
-                          border: '1px solid var(--border-light)',
-                          borderRadius: 'var(--radius-sm)',
-                          color: '#ffffff',
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: '0.85rem'
-                        }}
-                      />
-                    </div>
-
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {/* Shein Product URL */}
                     <div>
-                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                        LINK DA SHEIN (AFILIADO / DIRETO)
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontFamily: 'var(--font-mono)' }}>
+                        LINK DA SHEIN (COLE O LINK DA PEÇA AQUI)
                       </label>
                       <input 
                         type="url" 
-                        placeholder="https://shein.top/..."
+                        placeholder="https://shein.top/... ou https://www.shein.com/..."
                         value={piece.sheinUrl}
                         onChange={(e) => updatePieceField(index, 'sheinUrl', e.target.value)}
+                        required
                         style={{
                           width: '100%',
-                          padding: '8px 12px',
+                          padding: '10px 14px',
                           background: 'rgba(15,15,20,0.8)',
                           border: '1px solid var(--border-light)',
                           borderRadius: 'var(--radius-sm)',
