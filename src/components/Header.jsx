@@ -1,5 +1,6 @@
 import React from 'react';
 import { Instagram, Sparkles, ShieldCheck, Home } from './Icons';
+import Logo from './Logo';
 
 export default function Header({ currentView, setCurrentView, looksCount }) {
   return (
@@ -8,7 +9,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
       top: 0,
       zIndex: 100,
       borderBottom: '1px solid var(--border-light)',
-      padding: '12px 24px'
+      padding: '8px 24px'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -22,40 +23,10 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
         {/* Brand Logo Section */}
         <div 
           onClick={() => setCurrentView('home')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          title="STARBOY STREETWEAR"
         >
-          {/* Y2K Starboy Orbit SVG Logo */}
-          <div style={{ position: 'relative', width: '46px', height: '46px' }}>
-            <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-              <ellipse cx="50" cy="50" rx="42" ry="18" fill="none" stroke="#ffffff" strokeWidth="3" transform="rotate(-25 50 50)" />
-              <path d="M50 15 L53 42 L80 45 L55 58 L65 85 L50 68 L35 85 L45 58 L20 45 L47 42 Z" fill="#ffffff" />
-            </svg>
-          </div>
-
-          <div>
-            <div style={{ 
-              fontFamily: 'var(--font-heading)', 
-              fontSize: '1.25rem', 
-              fontWeight: 800, 
-              letterSpacing: '2px', 
-              color: '#ffffff',
-              lineHeight: 1.1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              STARBOY <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>✦</span>
-            </div>
-            <div style={{ 
-              fontFamily: 'var(--font-mono)', 
-              fontSize: '0.65rem', 
-              letterSpacing: '3px', 
-              color: 'var(--text-muted)',
-              textTransform: 'uppercase'
-            }}>
-              STREETWEAR • ACHADOS SHEIN
-            </div>
-          </div>
+          <Logo size="small" />
         </div>
 
         {/* Center / Social Link */}

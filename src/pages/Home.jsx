@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, Grid, Star } from '../components/Icons';
 import LookCard from '../components/LookCard';
+import Logo from '../components/Logo';
 
 export default function Home({ looks, onSelectLook }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,8 +42,12 @@ export default function Home({ looks, onSelectLook }) {
         <div style={{ position: 'absolute', top: '15px', left: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
         <div style={{ position: 'absolute', bottom: '15px', right: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
 
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+          <Logo size="large" />
+        </div>
+
         <div className="star-badge" style={{ marginBottom: '12px' }}>
-          ✦ STARBOY_BRAZIL OFFICIAL ✦
+          ✦ @STARBOY_BRAZIL OFFICIAL ✦
         </div>
 
         <h1 style={{ 
