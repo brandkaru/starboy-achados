@@ -26,7 +26,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
           style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
           title="STARBOY STREETWEAR"
         >
-          <StarLogo size={28} color="#ffffff" />
+          <StarLogo size={44} color="#ffffff" />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <span style={{ 

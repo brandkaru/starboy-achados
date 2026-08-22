@@ -38,8 +38,8 @@ export default function Home({ looks, onSelectLook }) {
         position: 'relative'
       }}>
         {/* Star Icon Centered */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-          <StarLogo size={56} color="#ffffff" />
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+          <StarLogo size={110} color="#ffffff" />
         </div>
 
         {/* Main Title */}
