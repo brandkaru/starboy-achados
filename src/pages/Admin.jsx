@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Plus, Trash2, Edit2, Download, 
   Lock, Unlock, Check, ImageIcon, 
-  Sparkles 
+  Sparkles, Star 
 } from '../components/Icons';
 
 export default function Admin({ looks, setLooks }) {
@@ -21,13 +21,12 @@ export default function Admin({ looks, setLooks }) {
   
   // Pieces State
   const [pieces, setPieces] = useState([
-    { id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Calças' }
+    { id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }
   ]);
 
   const categories = ['Streetwear', 'Masculino', 'Feminino', 'Dark', 'Acessórios'];
-  const pieceCategories = ['Camisas', 'Tops', 'Calças', 'Bermudas', 'Casacos', 'Calçados', 'Acessórios', 'Bolsas'];
 
-  // Handle PIN Login (Default PIN: "1234" or "starboy")
+  // Handle PIN Login (Default PIN: "starboy")
   const handleLogin = (e) => {
     e.preventDefault();
     if (pinInput === 'starboy' || pinInput === '1234' || pinInput === '') {
@@ -38,7 +37,7 @@ export default function Admin({ looks, setLooks }) {
     }
   };
 
-  // Image File Handler (converts uploaded image file to Data URL for instant rendering & localStorage)
+  // Single Image File Handler
   const handleImageUpload = (file, callback) => {
     if (file) {
       const reader = new FileReader();
@@ -49,11 +48,62 @@ export default function Admin({ looks, setLooks }) {
     }
   };
 
+  // BATCH MULTIPLE IMAGES UPLOAD HANDLER
+  const handleBatchImageUpload = (files) => {
+    if (!files || files.length === 0) return;
+
+    const fileArray = Array.from(files);
+    const readPromises = fileArray.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readPromises).then((images) => {
+      if (images.length > 0) {
+        // Set the 1st photo as Cover by default
+        setCoverImage(images[0]);
+
+        // Set remaining photos as Pieces
+        if (images.length > 1) {
+          const newPieces = images.slice(1).map((imgUrl, idx) => ({
+            id: `batch-${Date.now()}-${idx}`,
+            title: `Peça #${idx + 1}`,
+            sheinCode: '',
+            sheinUrl: '',
+            image: imgUrl,
+            category: 'Streetwear'
+          }));
+          setPieces(newPieces);
+        } else {
+          setPieces([{ id: '1', title: 'Peça #1', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
+        }
+      }
+    });
+  };
+
+  // Swap Cover with a Piece Photo in 1-click
+  const setPhotoAsCover = (pieceIndex) => {
+    const currentCover = coverImage;
+    const selectedPieceImage = pieces[pieceIndex].image;
+
+    // Swap cover image with the piece's image
+    setCoverImage(selectedPieceImage);
+
+    const updatedPieces = [...pieces];
+    if (currentCover) {
+      updatedPieces[pieceIndex].image = currentCover;
+    }
+    setPieces(updatedPieces);
+  };
+
   // Add Piece Row
   const addPieceRow = () => {
     setPieces([
       ...pieces,
-      { id: Date.now().toString(), title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Camisas' }
+      { id: Date.now().toString(), title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }
     ]);
   };
 
@@ -76,7 +126,7 @@ export default function Admin({ looks, setLooks }) {
     e.preventDefault();
 
     if (!coverImage) {
-      alert('Por favor, adicione uma foto de capa 4:5 para o Look!');
+      alert('Por favor, selecione as fotos ou defina uma Foto de Capa 4:5 para o Look!');
       return;
     }
 
@@ -90,9 +140,9 @@ export default function Admin({ looks, setLooks }) {
       createdAt: new Date().toISOString().split('T')[0],
       pieces: pieces.map((p, idx) => ({
         id: p.id || `p-${Date.now()}-${idx}`,
-        title: p.title || `Peça ${idx + 1}`,
+        title: p.title || `Peça #${idx + 1}`,
         sheinCode: p.sheinCode?.trim() || '',
-        sheinUrl: p.sheinUrl?.trim() || `https://www.shein.com/search?keyword=${p.sheinCode}`,
+        sheinUrl: p.sheinUrl?.trim() || (p.sheinCode ? `https://www.shein.com/search?keyword=${p.sheinCode}` : ''),
         image: p.image || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
         category: p.category || 'Streetwear'
       }))
@@ -108,7 +158,6 @@ export default function Admin({ looks, setLooks }) {
       alert('Novo Look publicado com sucesso! ✦');
     }
 
-    // Reset Form
     resetForm();
   };
 
@@ -119,7 +168,7 @@ export default function Admin({ looks, setLooks }) {
     setLookSubtitle('');
     setLookCategory('Streetwear');
     setCoverImage('');
-    setPieces([{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Calças' }]);
+    setPieces([{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
     setIsEditing(false);
     setEditingId(null);
   };
@@ -133,7 +182,7 @@ export default function Admin({ looks, setLooks }) {
     setLookSubtitle(look.subtitle || '');
     setLookCategory(look.category || 'Streetwear');
     setCoverImage(look.coverImage);
-    setPieces(look.pieces?.length > 0 ? look.pieces : [{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Calças' }]);
+    setPieces(look.pieces?.length > 0 ? look.pieces : [{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -191,7 +240,7 @@ export default function Admin({ looks, setLooks }) {
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <input 
             type="password"
-            placeholder="Digite o PIN de acesso (ou deixe em branco)..."
+            placeholder="Digite a senha (padrão: starboy)..."
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value)}
             style={{
@@ -209,7 +258,7 @@ export default function Admin({ looks, setLooks }) {
 
           {pinError && (
             <p style={{ color: '#ef4444', fontSize: '0.75rem' }}>
-              PIN incorreto. Tente "starboy" ou deixe em branco.
+              Senha incorreta. Tente "starboy" ou deixe em branco.
             </p>
           )}
 
@@ -267,9 +316,42 @@ export default function Admin({ looks, setLooks }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           <Sparkles color="#ffffff" size={20} />
           <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', letterSpacing: '1px' }}>
-            {isEditing ? 'EDITAR LOOK EXISTENTE' : 'POSTAR NOVO LOOK (CAPA + PEÇAS)'}
+            {isEditing ? 'EDITAR LOOK EXISTENTE' : 'POSTAR NOVO LOOK (UPLOAD EM LOTE)'}
           </h2>
         </div>
+
+        {/* BATCH UPLOAD HEADER PROMPT */}
+        {!isEditing && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
+            border: '1px dashed var(--accent-chrome)',
+            borderRadius: 'var(--radius-md)',
+            padding: '24px',
+            textAlign: 'center',
+            marginBottom: '28px'
+          }}>
+            <ImageIcon size={32} color="#ffffff" style={{ margin: '0 auto 12px' }} />
+            
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', marginBottom: '6px' }}>
+              ✦ SELECIONAR TODAS AS FOTOS DO LOOK DE UMA VEZ ✦
+            </h3>
+            
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '500px', margin: '0 auto 16px' }}>
+              Selecione todas as fotos do carrossel do Instagram de uma só vez (capa + peças). A 1ª foto será definida como Capa automaticamente e você poderá alternar com 1 clique!
+            </p>
+
+            <label className="y2k-btn" style={{ cursor: 'pointer', display: 'inline-flex' }}>
+              <span>SELECIONAR MÚLTIPLAS FOTOS</span>
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*"
+                onChange={(e) => handleBatchImageUpload(e.target.files)}
+                style={{ display: 'none' }}
+              />
+            </label>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
@@ -362,20 +444,27 @@ export default function Admin({ looks, setLooks }) {
             />
           </div>
 
-          {/* Cover Image Upload 4:5 */}
+          {/* Cover Image Selector */}
           <div style={{
-            border: '1px dashed var(--border-light)',
+            border: '1px solid var(--border-light)',
             padding: '20px',
             borderRadius: 'var(--radius-md)',
             background: 'rgba(255,255,255,0.02)'
           }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: '#ffffff' }}>
-              FOTO DE CAPA DO LOOK (Proporção 4:5)
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Star size={16} color="#ffffff" />
+                <span>FOTO DE CAPA DO LOOK (Aparece no Feed 4:5)</span>
+              </label>
+
+              {coverImage && (
+                <span className="star-badge" style={{ fontSize: '0.65rem' }}>CAPA DEFINIDA ✦</span>
+              )}
+            </div>
 
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
               {/* Cover Preview Box 4:5 */}
-              <div style={{ width: '110px' }} className="aspect-4-5">
+              <div style={{ width: '120px' }} className="aspect-4-5">
                 {coverImage ? (
                   <img src={coverImage} alt="Capa Preview" />
                 ) : (
@@ -393,7 +482,7 @@ export default function Admin({ looks, setLooks }) {
                   style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}
                 />
 
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OU cole a URL da imagem abaixo:</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OU cole a URL direta da foto de capa:</span>
 
                 <input 
                   type="url" 
@@ -416,9 +505,14 @@ export default function Admin({ looks, setLooks }) {
           {/* Dynamic Pieces Section */}
           <div style={{ marginTop: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: '#ffffff', letterSpacing: '1px' }}>
-                PEÇAS DO LOOK ({pieces.length})
-              </h3>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: '#ffffff', letterSpacing: '1px' }}>
+                  PEÇAS DO LOOK ({pieces.length})
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Defina o nome, o código/ID e o link de compra da Shein para cada peça:
+                </span>
+              </div>
 
               <button 
                 type="button" 
@@ -427,7 +521,7 @@ export default function Admin({ looks, setLooks }) {
                 style={{ fontSize: '0.8rem' }}
               >
                 <Plus size={14} />
-                <span>ADICIONAR OUTRA PEÇA</span>
+                <span>ADICIONAR PEÇA AVULSA</span>
               </button>
             </div>
 
@@ -448,9 +542,32 @@ export default function Admin({ looks, setLooks }) {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-                      PEÇA #{index + 1}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 700, color: '#ffffff' }}>
+                        PEÇA #{index + 1}
+                      </span>
+
+                      {/* Button to Set this Piece Photo as Cover */}
+                      {piece.image && (
+                        <button
+                          type="button"
+                          onClick={() => setPhotoAsCover(index)}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid var(--border-light)',
+                            color: '#ffffff',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontFamily: 'var(--font-mono)',
+                            cursor: 'pointer'
+                          }}
+                          title="Transformar esta foto na Foto de Capa do Look"
+                        >
+                          ✦ USAR ESTA FOTO COMO CAPA
+                        </button>
+                      )}
+                    </div>
 
                     {pieces.length > 1 && (
                       <button 
@@ -534,9 +651,9 @@ export default function Admin({ looks, setLooks }) {
                     </div>
                   </div>
 
-                  {/* Piece Photo Upload */}
+                  {/* Piece Photo Thumbnail */}
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
-                    <div style={{ width: '60px' }} className="aspect-4-5">
+                    <div style={{ width: '70px' }} className="aspect-4-5">
                       {piece.image ? (
                         <img src={piece.image} alt="Peça Preview" />
                       ) : (
@@ -556,7 +673,7 @@ export default function Admin({ looks, setLooks }) {
 
                       <input 
                         type="url" 
-                        placeholder="URL da Foto da Peça..."
+                        placeholder="OU URL da Foto da Peça..."
                         value={piece.image}
                         onChange={(e) => updatePieceField(index, 'image', e.target.value)}
                         style={{
@@ -584,7 +701,7 @@ export default function Admin({ looks, setLooks }) {
             )}
 
             <button type="submit" className="y2k-btn">
-              <span>{isEditing ? 'SALVAR ALTERAÇÕES ✦' : 'PUBLICAR LOOK ✦'}</span>
+              <span>{isEditing ? 'SALVAR ALTERAÇÕES ✦' : 'PUBLICAR LOOK COMPLETO ✦'}</span>
             </button>
           </div>
         </form>
