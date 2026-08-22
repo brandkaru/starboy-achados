@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Official Identical Tilted & Elongated Y2K Star Component
+// Official Identical Tilted Y2K Star Component
 export default function StarLogo({ size = 32, color = '#ffffff', style }) {
   return (
     <svg 
@@ -12,7 +12,7 @@ export default function StarLogo({ size = 32, color = '#ffffff', style }) {
       style={{ display: 'inline-block', verticalAlign: 'middle', overflow: 'visible', ...style }}
     >
       <path 
-        d="M 52 4 L 42 34 L 96 22 L 54 50 L 66 70 L 46 56 L 16 98 L 30 54 L 8 42 L 42 38 Z" 
+        d="M 54 8 L 60 32 L 92 22 L 66 48 L 68 65 L 50 56 L 22 91 L 35 52 L 15 44 L 44 34 Z" 
         fill={color}
       />
     </svg>
