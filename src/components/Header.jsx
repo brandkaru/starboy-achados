@@ -1,5 +1,5 @@
 import React from 'react';
-import { Instagram, Sparkles, ShieldCheck, Home } from './Icons';
+import { Instagram, ShieldCheck, Home } from './Icons';
 import StarLogo from './StarLogo';
 
 export default function Header({ currentView, setCurrentView, looksCount }) {
@@ -9,7 +9,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
       top: 0,
       zIndex: 100,
       borderBottom: '1px solid var(--border-light)',
-      padding: '12px 24px'
+      padding: '14px 24px'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -26,28 +26,28 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
           style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
           title="STARBOY STREETWEAR"
         >
-          <StarLogo size={36} color="#ffffff" />
+          <StarLogo size={28} color="#ffffff" />
 
-          <div>
-            <div style={{ 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <span style={{ 
               fontFamily: 'var(--font-heading)', 
-              fontSize: '1.2rem', 
-              fontWeight: 900, 
-              letterSpacing: '2px', 
+              fontSize: '1.1rem', 
+              fontWeight: 800, 
+              letterSpacing: '1.5px', 
               color: '#ffffff',
-              lineHeight: 1.1
+              lineHeight: 1
             }}>
-              STARBOY
-            </div>
-            <div style={{ 
+              STARBOY STREETWEAR
+            </span>
+            <span style={{ 
               fontFamily: 'var(--font-mono)', 
               fontSize: '0.65rem', 
-              letterSpacing: '3px', 
+              letterSpacing: '2px', 
               color: 'var(--text-muted)',
               textTransform: 'uppercase'
             }}>
-              STREETWEAR • ACHADOS SHEIN
-            </div>
+              ACHADOS SHEIN
+            </span>
           </div>
         </div>
 
@@ -64,13 +64,12 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
             textDecoration: 'none',
             fontSize: '0.85rem',
             fontFamily: 'var(--font-mono)',
-            padding: '6px 12px',
+            padding: '6px 14px',
             borderRadius: '20px',
             background: 'rgba(255, 255, 255, 0.05)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             transition: 'all 0.2s ease'
           }}
-          className="hover:border-white"
         >
           <Instagram size={14} color="#e2e8f0" />
           <span>@starboy_brazil</span>

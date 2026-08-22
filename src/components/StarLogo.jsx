@@ -11,23 +11,9 @@ export default function StarLogo({ size = 32, color = '#ffffff', style }) {
       xmlns="http://www.w3.org/2000/svg"
       style={{ display: 'inline-block', verticalAlign: 'middle', overflow: 'visible', ...style }}
     >
-      <defs>
-        <filter id="starGlowExact" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
-
-      {/* 
-        Exact Y2K Asymmetrical Star Path traced directly from original uploaded logo:
-        - Long upper-right sharp spike
-        - Long lower-left sharp spike
-        - Asymmetric sharp points
-      */}
       <path 
-        d="M 56 8 L 44 30 L 94 20 L 56 48 L 68 68 L 48 56 L 20 92 L 32 54 L 14 44 L 44 38 Z" 
+        d="M 52 4 L 42 34 L 96 22 L 54 50 L 66 70 L 46 56 L 16 98 L 30 54 L 8 42 L 42 38 Z" 
         fill={color}
-        filter="url(#starGlowExact)"
       />
     </svg>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, Grid, Star } from '../components/Icons';
+import { Search, Grid, Star } from '../components/Icons';
 import LookCard from '../components/LookCard';
 import StarLogo from '../components/StarLogo';
 
@@ -27,45 +27,39 @@ export default function Home({ looks, onSelectLook }) {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 16px 60px' }}>
       
-      {/* Hero Header Section */}
+      {/* Hero Banner Section */}
       <div style={{
         textAlign: 'center',
-        padding: '36px 20px',
-        marginBottom: '32px',
-        background: 'radial-gradient(ellipse at top, rgba(255,255,255,0.08) 0%, transparent 70%)',
+        padding: '48px 20px 40px',
+        marginBottom: '36px',
+        background: 'radial-gradient(circle at 50% 20%, rgba(255,255,255,0.06) 0%, transparent 70%)',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--border-light)',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative'
       }}>
-        {/* Y2K Star Accents */}
-        <div style={{ position: 'absolute', top: '15px', left: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
-        <div style={{ position: 'absolute', bottom: '15px', right: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
-
-        {/* Tilted Star Logo Icon */}
-        <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'center' }}>
-          <StarLogo size={68} color="#ffffff" />
+        {/* Star Icon Centered */}
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+          <StarLogo size={56} color="#ffffff" />
         </div>
 
-        <div className="star-badge" style={{ marginBottom: '12px' }}>
-          ✦ @STARBOY_BRAZIL OFFICIAL ✦
-        </div>
-
+        {/* Main Title */}
         <h1 style={{ 
           fontFamily: 'var(--font-heading)', 
-          fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', 
-          fontWeight: 900,
-          letterSpacing: '3px',
+          fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', 
+          fontWeight: 800,
+          letterSpacing: '2px',
           color: '#ffffff',
           textTransform: 'uppercase',
-          marginBottom: '4px'
+          marginBottom: '6px',
+          lineHeight: 1.1
         }}>
           STARBOY STREETWEAR
         </h1>
 
+        {/* Subtitle */}
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '1rem',
+          fontSize: '0.85rem',
           letterSpacing: '4px',
           color: 'var(--text-muted)',
           marginBottom: '20px',
@@ -76,16 +70,17 @@ export default function Home({ looks, onSelectLook }) {
 
         <p style={{ 
           color: 'var(--text-muted)', 
-          maxWidth: '550px', 
-          margin: '0 auto 24px', 
-          fontSize: '0.95rem' 
+          maxWidth: '520px', 
+          margin: '0 auto 28px', 
+          fontSize: '0.9rem',
+          lineHeight: 1.5
         }}>
           Encontre os links diretos de todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
         </p>
 
         {/* Search Bar */}
         <div style={{ 
-          maxWidth: '500px', 
+          maxWidth: '480px', 
           margin: '0 auto',
           position: 'relative'
         }}>
@@ -96,7 +91,7 @@ export default function Home({ looks, onSelectLook }) {
           />
           <input 
             type="text"
-            placeholder="Buscar por nº do Look ou Código Shein (ex: NQF5PV7)..."
+            placeholder="Buscar por nº do Look (ex: LOOK N#9)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -112,7 +107,6 @@ export default function Home({ looks, onSelectLook }) {
               boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
               transition: 'all 0.25s ease'
             }}
-            className="focus:border-white focus:ring-1 focus:ring-white"
           />
           {searchTerm && (
             <button 
@@ -134,8 +128,6 @@ export default function Home({ looks, onSelectLook }) {
           )}
         </div>
       </div>
-
-
 
       {/* Looks Grid Header */}
       <div style={{
