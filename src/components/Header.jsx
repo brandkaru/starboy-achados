@@ -1,6 +1,6 @@
 import React from 'react';
 import { Instagram, Sparkles, ShieldCheck, Home } from './Icons';
-import Logo from './Logo';
+import StarLogo from './StarLogo';
 
 export default function Header({ currentView, setCurrentView, looksCount }) {
   return (
@@ -9,7 +9,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
       top: 0,
       zIndex: 100,
       borderBottom: '1px solid var(--border-light)',
-      padding: '8px 24px'
+      padding: '12px 24px'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -20,13 +20,35 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
         flexWrap: 'wrap',
         gap: '16px'
       }}>
-        {/* Brand Logo Section */}
+        {/* Brand Logo & Name Section */}
         <div 
           onClick={() => setCurrentView('home')} 
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
           title="STARBOY STREETWEAR"
         >
-          <Logo size="small" />
+          <StarLogo size={36} color="#ffffff" />
+
+          <div>
+            <div style={{ 
+              fontFamily: 'var(--font-heading)', 
+              fontSize: '1.2rem', 
+              fontWeight: 900, 
+              letterSpacing: '2px', 
+              color: '#ffffff',
+              lineHeight: 1.1
+            }}>
+              STARBOY
+            </div>
+            <div style={{ 
+              fontFamily: 'var(--font-mono)', 
+              fontSize: '0.65rem', 
+              letterSpacing: '3px', 
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase'
+            }}>
+              STREETWEAR • ACHADOS SHEIN
+            </div>
+          </div>
         </div>
 
         {/* Center / Social Link */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, Grid, Star } from '../components/Icons';
 import LookCard from '../components/LookCard';
-import Logo from '../components/Logo';
+import StarLogo from '../components/StarLogo';
 
 export default function Home({ looks, onSelectLook }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,8 +42,9 @@ export default function Home({ looks, onSelectLook }) {
         <div style={{ position: 'absolute', top: '15px', left: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
         <div style={{ position: 'absolute', bottom: '15px', right: '20px', color: 'rgba(255,255,255,0.2)', fontSize: '1.5rem' }}>✦</div>
 
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-          <Logo size="large" />
+        {/* Tilted Star Logo Icon */}
+        <div style={{ marginBottom: '14px', display: 'flex', justifyContent: 'center' }}>
+          <StarLogo size={68} color="#ffffff" />
         </div>
 
         <div className="star-badge" style={{ marginBottom: '12px' }}>
@@ -52,15 +53,26 @@ export default function Home({ looks, onSelectLook }) {
 
         <h1 style={{ 
           fontFamily: 'var(--font-heading)', 
-          fontSize: 'clamp(2rem, 5vw, 3.2rem)', 
+          fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', 
           fontWeight: 900,
-          letterSpacing: '2px',
+          letterSpacing: '3px',
           color: '#ffffff',
           textTransform: 'uppercase',
-          marginBottom: '8px'
+          marginBottom: '4px'
+        }}>
+          STARBOY STREETWEAR
+        </h1>
+
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '1rem',
+          letterSpacing: '4px',
+          color: 'var(--text-muted)',
+          marginBottom: '20px',
+          textTransform: 'uppercase'
         }}>
           ACHADOS SHEIN
-        </h1>
+        </div>
 
         <p style={{ 
           color: 'var(--text-muted)', 
