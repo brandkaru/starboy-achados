@@ -3,17 +3,24 @@ import { Search, Sparkles, Grid, Star } from '../components/Icons';
 import LookCard from '../components/LookCard';
 
 export default function Home({ looks, onSelectLook }) {
-  // Filter looks by search term
-  const filteredLooks = looks.filter(look => {
-    return (
-      look.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      look.subtitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `look n#${look.number}`.includes(searchTerm.toLowerCase()) ||
-      look.pieces?.some(p => 
-        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.sheinCode?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Robust & Safe Search Filter
+  const filteredLooks = (looks || []).filter(look => {
+    if (!look) return false;
+    if (!searchTerm || !searchTerm.trim()) return true;
+    
+    const term = searchTerm.toLowerCase().trim();
+    const titleMatch = look.title ? String(look.title).toLowerCase().includes(term) : false;
+    const subtitleMatch = look.subtitle ? String(look.subtitle).toLowerCase().includes(term) : false;
+    const numberMatch = look.number !== undefined ? `look n#${look.number}`.includes(term) : false;
+    const pieceMatch = Array.isArray(look.pieces) ? look.pieces.some(p => 
+      (p.title && String(p.title).toLowerCase().includes(term)) ||
+      (p.sheinCode && String(p.sheinCode).toLowerCase().includes(term)) ||
+      (p.sheinUrl && String(p.sheinUrl).toLowerCase().includes(term))
+    ) : false;
+
+    return titleMatch || subtitleMatch || numberMatch || pieceMatch;
   });
 
   return (
