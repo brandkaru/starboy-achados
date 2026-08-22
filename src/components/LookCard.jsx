@@ -27,57 +27,6 @@ export default function LookCard({ look, onSelectLook }) {
           }}
         />
 
-        {/* Top Left Watermark: "ACHADOS SHEIN" */}
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          left: '12px',
-          background: 'rgba(255, 255, 255, 0.92)',
-          color: '#000000',
-          padding: '4px 8px',
-          borderRadius: '2px',
-          fontFamily: 'var(--font-heading)',
-          fontWeight: 800,
-          fontSize: '0.7rem',
-          letterSpacing: '1px',
-          lineHeight: 1.1,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-          textTransform: 'uppercase'
-        }}>
-          <div>ACHADOS</div>
-          <div style={{ fontSize: '0.85rem' }}>SHEIN</div>
-        </div>
-
-        {/* Bottom Left Label: "LOOK N#X" */}
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          left: '12px',
-          fontFamily: 'var(--font-mono)',
-          color: '#000000',
-          fontWeight: 800,
-          fontSize: '0.75rem',
-          letterSpacing: '1px',
-          background: 'rgba(255, 255, 255, 0.9)',
-          padding: '2px 6px',
-          borderRadius: '2px'
-        }}>
-          {look.title || `LOOK N#${look.number}`}
-        </div>
-
-        {/* Bottom Right Instagram Graphic: Black Y2K Star */}
-        <div style={{
-          position: 'absolute',
-          bottom: '8px',
-          right: '8px',
-          color: '#000000',
-          fontSize: '1.6rem',
-          lineHeight: 1,
-          filter: 'drop-shadow(0px 0px 3px rgba(255,255,255,0.8))'
-        }}>
-          ✦
-        </div>
-
         {/* Hover Overlay Button */}
         <div 
           style={{

@@ -68,32 +68,6 @@ export default function LookDetail({ look, onBack }) {
           <div className="aspect-4-5" style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
             <img src={look.coverImage} alt={look.title} />
 
-            {/* Instagram Style Overlay */}
-            <div style={{
-              position: 'absolute',
-              top: '12px',
-              left: '12px',
-              background: 'rgba(255, 255, 255, 0.95)',
-              color: '#000000',
-              padding: '4px 8px',
-              borderRadius: '2px',
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: '0.7rem',
-              letterSpacing: '1px'
-            }}>
-              ACHADOS SHEIN
-            </div>
-
-            <div style={{
-              position: 'absolute',
-              bottom: '12px',
-              right: '12px',
-              color: '#000000',
-              fontSize: '1.5rem'
-            }}>
-              ✦
-            </div>
           </div>
         </div>
 
