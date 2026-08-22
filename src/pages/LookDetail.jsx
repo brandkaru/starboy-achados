@@ -73,9 +73,6 @@ export default function LookDetail({ look, onBack }) {
 
         {/* Look Meta Info */}
         <div>
-          <div className="star-badge" style={{ marginBottom: '12px' }}>
-            ✦ {look.category || 'STREETWEAR'}
-          </div>
 
           <h1 style={{ 
             fontFamily: 'var(--font-heading)', 

@@ -16,15 +16,13 @@ export default function Admin({ looks, setLooks }) {
   const [lookNumber, setLookNumber] = useState(looks.length + 1);
   const [lookTitle, setLookTitle] = useState(`LOOK N#${looks.length + 1}`);
   const [lookSubtitle, setLookSubtitle] = useState('');
-  const [lookCategory, setLookCategory] = useState('Streetwear');
+  const [lookCategory, setLookCategory] = useState('');
   const [coverImage, setCoverImage] = useState('');
   
   // Pieces State
   const [pieces, setPieces] = useState([
-    { id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }
+    { id: '1', title: '', sheinCode: '', sheinUrl: '', image: '' }
   ]);
-
-  const categories = ['Streetwear', 'Masculino', 'Feminino', 'Dark', 'Acessórios'];
 
   // Handle PIN Login (Default PIN: "starboy")
   const handleLogin = (e) => {
@@ -400,28 +398,7 @@ export default function Admin({ looks, setLooks }) {
                   color: '#ffffff'
                 }}
               />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', fontFamily: 'var(--font-mono)' }}>
-                CATEGORIA DO LOOK
-              </label>
-              <select
-                value={lookCategory}
-                onChange={(e) => setLookCategory(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: '#ffffff'
-                }}
-              >
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-          </div>
+            </div>          </div>
 
           {/* Subtitle */}
           <div>
@@ -699,7 +676,7 @@ export default function Admin({ looks, setLooks }) {
                     {look.title}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {look.pieces?.length || 0} peças cadastradas • {look.category}
+                    {look.pieces?.length || 0} peças cadastradas
                   </div>
                 </div>
               </div>

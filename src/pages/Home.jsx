@@ -3,25 +3,17 @@ import { Search, Sparkles, Grid, Star } from '../components/Icons';
 import LookCard from '../components/LookCard';
 
 export default function Home({ looks, onSelectLook }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-
-  const categories = ['Todos', 'Streetwear', 'Masculino', 'Feminino', 'Dark', 'Acessórios'];
-
-  // Filter looks by search term (look number, piece title, shein code) and category
+  // Filter looks by search term
   const filteredLooks = looks.filter(look => {
-    const matchesSearch = 
+    return (
       look.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       look.subtitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `look n#${look.number}`.includes(searchTerm.toLowerCase()) ||
       look.pieces?.some(p => 
         p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.sheinCode?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-    const matchesCategory = selectedCategory === 'Todos' || look.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
+      )
+    );
   });
 
   return (
@@ -119,38 +111,7 @@ export default function Home({ looks, onSelectLook }) {
         </div>
       </div>
 
-      {/* Category Pills */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        overflowX: 'auto',
-        paddingBottom: '12px',
-        marginBottom: '24px',
-        scrollbarWidth: 'none'
-      }}>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            style={{
-              padding: '8px 18px',
-              borderRadius: '20px',
-              border: selectedCategory === cat ? '1px solid #ffffff' : '1px solid var(--border-light)',
-              background: selectedCategory === cat ? '#ffffff' : 'rgba(255,255,255,0.04)',
-              color: selectedCategory === cat ? '#000000' : 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {cat.toUpperCase()}
-          </button>
-        ))}
-      </div>
+
 
       {/* Looks Grid Header */}
       <div style={{
