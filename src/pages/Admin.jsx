@@ -514,9 +514,21 @@ export default function Admin({ looks, setLooks }) {
             </div>
 
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <div style={{ width: '120px' }} className="aspect-4-5">
+              <div style={{ 
+                width: '100px', 
+                minWidth: '100px',
+                height: '125px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                background: '#111115',
+                border: '1px solid var(--border-light)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
                 {coverImage ? (
-                  <img src={coverImage} alt="Capa Preview" />
+                  <img src={coverImage} alt="Capa Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
                     <ImageIcon size={28} />
@@ -524,7 +536,7 @@ export default function Admin({ looks, setLooks }) {
                 )}
               </div>
 
-              <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '220px' }}>
                 <input 
                   type="file" 
                   accept="image/*"
@@ -532,12 +544,18 @@ export default function Admin({ looks, setLooks }) {
                   style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}
                 />
 
+                {coverImage?.startsWith('data:') && (
+                  <div style={{ fontSize: '0.75rem', color: '#22c55e', fontFamily: 'var(--font-mono)' }}>
+                    ✓ Foto enviada do dispositivo
+                  </div>
+                )}
+
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OU cole a URL direta da foto de capa:</span>
 
                 <input 
                   type="url" 
-                  placeholder="https://..."
-                  value={coverImage}
+                  placeholder={coverImage?.startsWith('data:') ? '📷 Foto Carregada do Dispositivo' : 'https://...'}
+                  value={coverImage?.startsWith('data:') ? '' : (coverImage || '')}
                   onChange={(e) => setCoverImage(e.target.value)}
                   style={{
                     padding: '8px 12px',
@@ -654,18 +672,35 @@ export default function Admin({ looks, setLooks }) {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
-                    <div style={{ width: '70px' }} className="aspect-4-5">
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap' }}>
+                    <div style={{ 
+                      width: '70px', 
+                      minWidth: '70px',
+                      height: '88px',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      background: '#111115',
+                      border: '1px solid var(--border-light)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
                       {piece.image ? (
-                        <img src={piece.image} alt="Peça Preview" />
+                        <img 
+                          src={piece.image} 
+                          alt={`Peça ${index + 1} Preview`} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                        />
                       ) : (
-                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#666666' }}>
                           <ImageIcon size={18} />
+                          <span style={{ fontSize: '0.6rem' }}>Sem foto</span>
                         </div>
                       )}
                     </div>
 
-                    <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '200px' }}>
                       <input 
                         type="file" 
                         accept="image/*"
@@ -673,10 +708,16 @@ export default function Admin({ looks, setLooks }) {
                         style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}
                       />
 
+                      {piece.image?.startsWith('data:') && (
+                        <div style={{ fontSize: '0.7rem', color: '#22c55e', fontFamily: 'var(--font-mono)' }}>
+                          ✓ Foto enviada do dispositivo
+                        </div>
+                      )}
+
                       <input 
                         type="url" 
-                        placeholder="OU URL da Foto da Peça..."
-                        value={piece.image}
+                        placeholder={piece.image?.startsWith('data:') ? '📷 Foto Carregada do Dispositivo' : 'OU URL da Foto da Peça...'}
+                        value={piece.image?.startsWith('data:') ? '' : (piece.image || '')}
                         onChange={(e) => updatePieceField(index, 'image', e.target.value)}
                         style={{
                           padding: '6px 10px',
@@ -921,17 +962,48 @@ export default function Admin({ looks, setLooks }) {
                 flexWrap: 'wrap'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '50px' }} className="aspect-4-5">
-                  <img src={look.coverImage} alt={look.title} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <div style={{ 
+                  width: '46px', 
+                  height: '58px', 
+                  borderRadius: '6px', 
+                  overflow: 'hidden', 
+                  background: '#111', 
+                  border: '1px solid var(--border-light)',
+                  flexShrink: 0 
+                }}>
+                  <img src={look.coverImage} alt={look.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
 
                 <div>
-                  <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.9rem' }}>
+                  <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: '#ffffff' }}>
                     {look.title}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {look.pieces?.length || 0} peças cadastradas
+                  
+                  {/* Thumbnails of Pieces */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {look.pieces?.length || 0} peças:
+                    </span>
+                    {look.pieces?.slice(0, 5).map((p, pIdx) => (
+                      <div 
+                        key={p.id || pIdx} 
+                        style={{ 
+                          width: '24px', 
+                          height: '30px', 
+                          borderRadius: '3px', 
+                          overflow: 'hidden', 
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          background: '#222'
+                        }}
+                      >
+                        {p.image ? (
+                          <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', background: '#333' }} />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
