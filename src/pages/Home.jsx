@@ -17,22 +17,42 @@ export default function Home({ looks, onSelectLook }) {
     return dateB - dateA;
   });
 
-  // Robust & Safe Search Filter
+  // Ultra-Smart & Flexible Search Filter
   const filteredLooks = sortedLooks.filter(look => {
     if (!look) return false;
     if (!searchTerm || !searchTerm.trim()) return true;
     
-    const term = searchTerm.toLowerCase().trim();
-    const titleMatch = look.title ? String(look.title).toLowerCase().includes(term) : false;
-    const subtitleMatch = look.subtitle ? String(look.subtitle).toLowerCase().includes(term) : false;
-    const numberMatch = look.number !== undefined ? `look n#${look.number}`.includes(term) : false;
-    const pieceMatch = Array.isArray(look.pieces) ? look.pieces.some(p => 
-      (p.title && String(p.title).toLowerCase().includes(term)) ||
-      (p.sheinCode && String(p.sheinCode).toLowerCase().includes(term)) ||
-      (p.sheinUrl && String(p.sheinUrl).toLowerCase().includes(term))
-    ) : false;
+    const rawTerm = searchTerm.toLowerCase().trim();
+    const digitsOnly = rawTerm.replace(/\D/g, ''); // Extract numbers e.g. "look 9" -> "9"
+    const cleanTerm = rawTerm.replace(/[^a-z0-9]/g, ''); // Strip symbols e.g. "look n#9" -> "lookn9"
 
-    return titleMatch || subtitleMatch || numberMatch || pieceMatch;
+    const lookTitle = String(look.title || '').toLowerCase();
+    const lookSubtitle = String(look.subtitle || '').toLowerCase();
+    const lookNumber = String(look.number || '');
+    const cleanTitle = lookTitle.replace(/[^a-z0-9]/g, '');
+
+    // 1. Direct match on title or subtitle
+    if (lookTitle.includes(rawTerm) || lookSubtitle.includes(rawTerm)) return true;
+
+    // 2. Cleaned match without symbols (e.g. "look 9" matches "LOOK N#9")
+    if (cleanTerm && cleanTitle.includes(cleanTerm)) return true;
+
+    // 3. Number match (e.g. typing "9" or "look 9" matches number 9)
+    if (digitsOnly && (lookNumber === digitsOnly || lookNumber.includes(digitsOnly))) return true;
+
+    // 4. Match inside pieces (shein code, title, url)
+    if (Array.isArray(look.pieces)) {
+      const pieceFound = look.pieces.some(p => {
+        if (!p) return false;
+        const pTitle = String(p.title || '').toLowerCase();
+        const pCode = String(p.sheinCode || '').toLowerCase();
+        const pUrl = String(p.sheinUrl || '').toLowerCase();
+        return pTitle.includes(rawTerm) || pCode.includes(rawTerm) || pUrl.includes(rawTerm);
+      });
+      if (pieceFound) return true;
+    }
+
+    return false;
   });
 
   return (
