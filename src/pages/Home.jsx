@@ -6,8 +6,19 @@ import StarLogo from '../components/StarLogo';
 export default function Home({ looks, onSelectLook }) {
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Sort looks: Latest created / highest look number FIRST (Top of Home Page)
+  const sortedLooks = [...(looks || [])].sort((a, b) => {
+    const numA = Number(a?.number) || 0;
+    const numB = Number(b?.number) || 0;
+    if (numA !== numB) return numB - numA;
+
+    const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+
   // Robust & Safe Search Filter
-  const filteredLooks = (looks || []).filter(look => {
+  const filteredLooks = sortedLooks.filter(look => {
     if (!look) return false;
     if (!searchTerm || !searchTerm.trim()) return true;
     
