@@ -9,9 +9,11 @@ import { getCloudLooks } from './services/cloudDb';
 import StarLogo from './components/StarLogo';
 
 export default function App() {
-  // Secret routing check: URL hash #admin or path /admin
+  // Secret routing check: Only opens admin if URL has secret key #sb96, #manage, or ?key=sb96
   const [currentView, setCurrentView] = useState(() => {
-    if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+    const hash = window.location.hash;
+    const search = window.location.search;
+    if (hash === '#sb96' || hash === '#manage' || search.includes('key=sb96') || search.includes('admin=sb96')) {
       return 'admin';
     }
     return 'home';
@@ -33,17 +35,23 @@ export default function App() {
     return INITIAL_LOOKS;
   });
 
-  // Listen to hash changes for secret admin access (#admin)
+  // Listen to hash/search changes for secret admin access (#sb96, #manage)
   useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+    const handleLocationChange = () => {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      if (hash === '#sb96' || hash === '#manage' || search.includes('key=sb96') || search.includes('admin=sb96')) {
         setCurrentView('admin');
-      } else if (!window.location.hash) {
+      } else if (!hash && !search.includes('key=')) {
         if (currentView === 'admin') setCurrentView('home');
       }
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
   }, [currentView]);
 
   // Auto-sync with Cloud Database on mount & tab focus
@@ -183,21 +191,8 @@ export default function App() {
             </a>
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: '#666666', marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span>© {new Date().getFullYear()} STARBOY STREETWEAR</span>
-            <span>•</span>
-            <a 
-              href="#admin" 
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.hash = '#admin';
-                setCurrentView('admin');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              style={{ color: '#444444', textDecoration: 'none', fontSize: '0.7rem' }}
-            >
-              ✦ Acesso Admin
-            </a>
+          <div style={{ fontSize: '0.75rem', color: '#666666', marginTop: '12px' }}>
+            © {new Date().getFullYear()} STARBOY STREETWEAR • Todos os direitos reservados.
           </div>
         </div>
       </footer>
