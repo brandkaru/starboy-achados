@@ -8,7 +8,14 @@ import { Instagram, ArrowUp } from './components/Icons';
 import { getCloudLooks } from './services/cloudDb';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'look_detail' | 'admin'
+  // Secret routing check: URL hash #admin or path /admin
+  const [currentView, setCurrentView] = useState(() => {
+    if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+      return 'admin';
+    }
+    return 'home';
+  });
+
   const [selectedLook, setSelectedLook] = useState(null);
   
   // Load looks from localStorage or fallback to INITIAL_LOOKS
@@ -25,14 +32,32 @@ export default function App() {
     return INITIAL_LOOKS;
   });
 
-  // Auto-sync with Cloud Database on mount
+  // Listen to hash changes for secret admin access (#admin)
   useEffect(() => {
-    getCloudLooks().then(cloudLooks => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+        setCurrentView('admin');
+      } else if (!window.location.hash) {
+        if (currentView === 'admin') setCurrentView('home');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [currentView]);
+
+  // Auto-sync with Cloud Database on mount & tab focus
+  useEffect(() => {
+    const syncCloud = async () => {
+      const cloudLooks = await getCloudLooks();
       if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
         setLooks(cloudLooks);
         localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));
       }
-    });
+    };
+
+    syncCloud();
+    window.addEventListener('focus', syncCloud);
+    return () => window.removeEventListener('focus', syncCloud);
   }, []);
 
   // Save looks to localStorage on state update
@@ -64,7 +89,10 @@ export default function App() {
         currentView={currentView} 
         setCurrentView={(view) => {
           setCurrentView(view);
-          if (view === 'home') setSelectedLook(null);
+          if (view === 'home') {
+            setSelectedLook(null);
+            window.location.hash = '';
+          }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         looksCount={looks.length}
@@ -154,8 +182,21 @@ export default function App() {
             </a>
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: '#666666', marginTop: '12px' }}>
-            © {new Date().getFullYear()} STARBOY STREETWEAR • Todos os direitos reservados. Prontinho para Vercel.
+          <div style={{ fontSize: '0.75rem', color: '#666666', marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span>© {new Date().getFullYear()} STARBOY STREETWEAR</span>
+            <span>•</span>
+            <a 
+              href="#admin" 
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.hash = '#admin';
+                setCurrentView('admin');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              style={{ color: '#444444', textDecoration: 'none', fontSize: '0.7rem' }}
+            >
+              ✦ Acesso Admin
+            </a>
           </div>
         </div>
       </footer>

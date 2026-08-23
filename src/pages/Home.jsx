@@ -44,7 +44,11 @@ export default function Home({ looks, onSelectLook }) {
       >
         {/* Star Icon Centered */}
         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-          <StarLogo size={80} color="#ffffff" className="hero-star" />
+          <StarLogo size={70} color="#ffffff" className="hero-star" />
+        </div>
+
+        <div className="star-badge" style={{ marginBottom: '14px' }}>
+          ✦ SELEÇÃO EXCLUSIVA DE LOOKS ✦
         </div>
 
         {/* Main Title */}
@@ -52,31 +56,19 @@ export default function Home({ looks, onSelectLook }) {
           className="hero-title"
           style={{ 
             fontFamily: 'var(--font-heading)', 
-            fontSize: 'clamp(1.4rem, 4vw, 2.5rem)', 
+            fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', 
             fontWeight: 800,
             letterSpacing: '1.5px',
             color: '#ffffff',
             textTransform: 'uppercase',
-            marginBottom: '4px',
+            marginBottom: '8px',
             lineHeight: 1.15,
             maxWidth: '100%',
             wordBreak: 'break-word'
           }}
         >
-          STARBOY STREETWEAR
+          ENCONTRE AS PEÇAS DO SEU OUTFIT
         </h1>
-
-        {/* Subtitle */}
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.8rem',
-          letterSpacing: '3px',
-          color: 'var(--text-muted)',
-          marginBottom: '16px',
-          textTransform: 'uppercase'
-        }}>
-          ACHADOS SHEIN
-        </div>
 
         <p style={{ 
           color: 'var(--text-muted)', 
@@ -85,7 +77,7 @@ export default function Home({ looks, onSelectLook }) {
           fontSize: '0.85rem',
           lineHeight: 1.5
         }}>
-          Encontre os links diretos de todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
+          Links diretos de compra na Shein para todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
         </p>
 
         {/* Search Bar */}
@@ -159,10 +151,6 @@ export default function Home({ looks, onSelectLook }) {
             TODOS OS LOOKS ({filteredLooks.length})
           </h2>
         </div>
-
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Fotos no formato 4:5
-        </span>
       </div>
 
       {/* 4:5 Grid Section */}
