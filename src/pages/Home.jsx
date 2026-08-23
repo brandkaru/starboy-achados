@@ -17,41 +17,19 @@ export default function Home({ looks, onSelectLook }) {
     return dateB - dateA;
   });
 
-  // Ultra-Smart & Flexible Search Filter
+  // Look Number ONLY Search Filter
   const filteredLooks = sortedLooks.filter(look => {
     if (!look) return false;
     if (!searchTerm || !searchTerm.trim()) return true;
     
-    const query = searchTerm.toLowerCase().trim();
-    const queryDigits = query.replace(/\D/g, ''); // Extract numbers e.g. "look 1" -> "1"
-    const queryClean = query.replace(/[^a-z0-9]/g, ''); // Strip symbols e.g. "look n#1" -> "lookn1"
-
-    const lookTitle = String(look.title || '').toLowerCase();
-    const lookSubtitle = String(look.subtitle || '').toLowerCase();
+    // Extract numbers from input e.g. "look 1", "#1", "1", "look n#1" -> "1"
+    const inputDigits = searchTerm.trim().replace(/\D/g, '');
     const lookNumberStr = String(look.number ?? '');
-    const cleanTitle = lookTitle.replace(/[^a-z0-9]/g, '');
 
-    // 1. Direct substring match on Title or Subtitle
-    if (lookTitle.includes(query) || lookSubtitle.includes(query)) return true;
-
-    // 2. Cleaned match without symbols (e.g. "look 1" or "look1" matches "LOOK N#1")
-    if (queryClean && cleanTitle.includes(queryClean)) return true;
-
-    // 3. Number match (e.g. typing "1" or "01" matches look.number === 1)
-    if (queryDigits && (lookNumberStr === queryDigits || lookNumberStr.includes(queryDigits))) return true;
-
-    // 4. Sub-pieces match (Shein code, piece name, url)
-    if (Array.isArray(look.pieces)) {
-      const pieceFound = look.pieces.some(p => {
-        if (!p) return false;
-        const pTitle = String(p.title || '').toLowerCase();
-        const pCode = String(p.sheinCode || '').toLowerCase();
-        const pUrl = String(p.sheinUrl || '').toLowerCase();
-        return pTitle.includes(query) || pCode.includes(query) || pUrl.includes(query);
-      });
-      if (pieceFound) return true;
+    if (inputDigits) {
+      return lookNumberStr === inputDigits || lookNumberStr.includes(inputDigits);
     }
-
+    
     return false;
   });
 
