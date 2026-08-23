@@ -203,6 +203,26 @@ export default function Admin({ looks, setLooks }) {
     downloadAnchor.remove();
   };
 
+  // Import Data JSON to Sync Device Storage Instantaneously
+  const handleImportJSON = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (Array.isArray(importedData)) {
+          setLooks(importedData);
+          alert(`✦ Sucesso! ${importedData.length} looks foram sincronizados para este dispositivo!`);
+        } else {
+          alert('Arquivo JSON inválido.');
+        }
+      } catch (err) {
+        alert('Erro ao ler arquivo JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Generate Automation Text for DM
   const getAutomationDMText = (targetLook) => {
     if (!targetLook) return '';
@@ -325,7 +345,18 @@ export default function Admin({ looks, setLooks }) {
           </h1>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <label className="y2k-btn-secondary" style={{ cursor: 'pointer', display: 'inline-flex' }} title="Importar backup JSON de looks">
+            <ImageIcon size={14} />
+            <span>IMPORTAR BACKUP</span>
+            <input 
+              type="file" 
+              accept=".json"
+              onChange={(e) => handleImportJSON(e.target.files[0])}
+              style={{ display: 'none' }}
+            />
+          </label>
+
           <button onClick={handleExportJSON} className="y2k-btn-secondary" title="Baixar dados em JSON">
             <Download size={14} />
             <span>EXPORTAR BACKUP JSON</span>
