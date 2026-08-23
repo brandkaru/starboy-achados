@@ -5,6 +5,7 @@ import LookDetail from './pages/LookDetail';
 import Admin from './pages/Admin';
 import { INITIAL_LOOKS } from './data/initialData';
 import { Instagram, ArrowUp } from './components/Icons';
+import { fetchCloudLooks } from './services/cloudDb';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'look_detail' | 'admin'
@@ -15,13 +16,24 @@ export default function App() {
     const saved = localStorage.getItem('starboy_looks');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {
         console.error('Erro ao ler localStorage', e);
       }
     }
     return INITIAL_LOOKS;
   });
+
+  // Auto-sync with Cloud Database on mount
+  useEffect(() => {
+    fetchCloudLooks().then(cloudLooks => {
+      if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
+        setLooks(cloudLooks);
+        localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));
+      }
+    });
+  }, []);
 
   // Save looks to localStorage on state update
   useEffect(() => {
