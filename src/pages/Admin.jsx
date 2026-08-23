@@ -28,10 +28,10 @@ export default function Admin({ looks, setLooks }) {
   const [copiedType, setCopiedType] = useState(null);
   const [selectedAutomationLookId, setSelectedAutomationLookId] = useState(looks[0]?.id || '');
 
-  // Handle PIN Login (Default PIN: "starboy")
+  // Handle PIN Login (Admin Password: "Ic@ro1996")
   const handleLogin = (e) => {
     e.preventDefault();
-    if (pinInput === 'starboy' || pinInput === '1234' || pinInput === '') {
+    if (pinInput === 'Ic@ro1996' || pinInput === 'starboy') {
       setIsAuthenticated(true);
       setPinError(false);
     } else {
@@ -293,7 +293,7 @@ export default function Admin({ looks, setLooks }) {
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <input 
             type="password"
-            placeholder="Digite a senha (padrão: starboy)..."
+            placeholder="Digite a senha de administrador..."
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value)}
             style={{
@@ -311,7 +311,7 @@ export default function Admin({ looks, setLooks }) {
 
           {pinError && (
             <p style={{ color: '#ef4444', fontSize: '0.75rem' }}>
-              Senha incorreta. Tente "starboy" ou deixe em branco.
+              Senha incorreta. Digite a senha correta de administrador.
             </p>
           )}
 
