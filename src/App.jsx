@@ -21,18 +21,29 @@ export default function App() {
 
   const [selectedLook, setSelectedLook] = useState(null);
   
-  // Load looks from localStorage or fallback to INITIAL_LOOKS
+  // Smart Initial State: Always merges server INITIAL_LOOKS with local cache so all devices get all looks
   const [looks, setLooks] = useState(() => {
+    let serverLooks = Array.isArray(INITIAL_LOOKS) ? INITIAL_LOOKS : [];
     const saved = localStorage.getItem('starboy_looks');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const mergedMap = new Map();
+          serverLooks.forEach(l => mergedMap.set(String(l.number || l.id), l));
+          parsed.forEach(l => {
+            const key = String(l.number || l.id);
+            if (!mergedMap.has(key)) {
+              mergedMap.set(key, l);
+            }
+          });
+          return Array.from(mergedMap.values()).sort((a, b) => (Number(b.number) || 0) - (Number(a.number) || 0));
+        }
       } catch (e) {
         console.error('Erro ao ler localStorage', e);
       }
     }
-    return INITIAL_LOOKS;
+    return serverLooks;
   });
 
   // Deep link detection for specific look URLs (?look=2 or #look-2)
