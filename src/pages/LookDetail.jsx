@@ -1,16 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, ShoppingBag, Layers, Share2, Check } from '../components/Icons';
 import PieceCard from '../components/PieceCard';
 
 export default function LookDetail({ look, onBack }) {
-  const [shareCopied, setShareCopied] = React.useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   if (!look) return null;
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShareCopied(true);
-    setTimeout(() => setShareCopied(false), 2000);
+  const handleShare = async (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
+    const cleanOrigin = window.location.origin;
+    const shareUrl = `${cleanOrigin}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `STARBOY STREETWEAR - ${look.title || `LOOK N#${look.number}`}`,
+          text: `Confira todas as peças do ${look.title || `LOOK N#${look.number}`} no site:`,
+          url: shareUrl
+        });
+        return;
+      } catch (err) {
+        // User cancelled or share failed, fallback to copy
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2500);
+    } catch (err) {
+      console.warn('Erro ao copiar link:', err);
+    }
   };
 
   return (
@@ -21,9 +44,11 @@ export default function LookDetail({ look, onBack }) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '24px'
+        marginBottom: '24px',
+        gap: '12px'
       }}>
         <button 
+          type="button"
           onClick={onBack}
           className="y2k-btn-secondary"
           style={{ fontSize: '0.85rem' }}
@@ -33,6 +58,7 @@ export default function LookDetail({ look, onBack }) {
         </button>
 
         <button 
+          type="button"
           onClick={handleShare}
           className="y2k-btn-secondary"
           style={{ fontSize: '0.8rem' }}
@@ -40,7 +66,7 @@ export default function LookDetail({ look, onBack }) {
           {shareCopied ? (
             <>
               <Check size={14} color="#4ade80" />
-              <span style={{ color: '#4ade80' }}>LINK COPIADO!</span>
+              <span style={{ color: '#4ade80' }}>LINK COPIADO! ✦</span>
             </>
           ) : (
             <>
@@ -65,15 +91,13 @@ export default function LookDetail({ look, onBack }) {
       }}>
         {/* Look Cover 4:5 Preview */}
         <div style={{ maxWidth: '320px', width: '100%', margin: '0 auto' }}>
-          <div className="aspect-4-5" style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-            <img src={look.coverImage} alt={look.title} />
-
+          <div className="aspect-4-5" style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', overflow: 'hidden' }}>
+            <img src={look.coverImage} alt={look.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         </div>
 
         {/* Look Meta Info */}
         <div>
-
           <h1 style={{ 
             fontFamily: 'var(--font-heading)', 
             fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
@@ -115,28 +139,26 @@ export default function LookDetail({ look, onBack }) {
 
       {/* Pieces Section Header */}
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         marginBottom: '24px',
         paddingBottom: '12px',
         borderBottom: '1px solid var(--border-light)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <ShoppingBag size={18} color="#ffffff" />
           <h2 style={{ 
             fontFamily: 'var(--font-mono)', 
             fontSize: '1.1rem', 
             letterSpacing: '1px',
-            color: '#ffffff'
+            color: '#ffffff',
+            margin: 0
           }}>
             PEÇAS E LINKS DA SHEIN
           </h2>
         </div>
 
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, paddingLeft: '26px' }}>
           Clique no botão para abrir o item
-        </span>
+        </p>
       </div>
 
       {/* Grid of Piece Cards */}
