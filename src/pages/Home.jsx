@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Grid, Star } from '../components/Icons';
+import { Search, Grid } from '../components/Icons';
 import LookCard from '../components/LookCard';
 import StarLogo from '../components/StarLogo';
 
@@ -22,32 +22,32 @@ export default function Home({ looks, onSelectLook }) {
     if (!look) return false;
     if (!searchTerm || !searchTerm.trim()) return true;
     
-    const rawTerm = searchTerm.toLowerCase().trim();
-    const digitsOnly = rawTerm.replace(/\D/g, ''); // Extract numbers e.g. "look 9" -> "9"
-    const cleanTerm = rawTerm.replace(/[^a-z0-9]/g, ''); // Strip symbols e.g. "look n#9" -> "lookn9"
+    const query = searchTerm.toLowerCase().trim();
+    const queryDigits = query.replace(/\D/g, ''); // Extract numbers e.g. "look 1" -> "1"
+    const queryClean = query.replace(/[^a-z0-9]/g, ''); // Strip symbols e.g. "look n#1" -> "lookn1"
 
     const lookTitle = String(look.title || '').toLowerCase();
     const lookSubtitle = String(look.subtitle || '').toLowerCase();
-    const lookNumber = String(look.number || '');
+    const lookNumberStr = String(look.number ?? '');
     const cleanTitle = lookTitle.replace(/[^a-z0-9]/g, '');
 
-    // 1. Direct match on title or subtitle
-    if (lookTitle.includes(rawTerm) || lookSubtitle.includes(rawTerm)) return true;
+    // 1. Direct substring match on Title or Subtitle
+    if (lookTitle.includes(query) || lookSubtitle.includes(query)) return true;
 
-    // 2. Cleaned match without symbols (e.g. "look 9" matches "LOOK N#9")
-    if (cleanTerm && cleanTitle.includes(cleanTerm)) return true;
+    // 2. Cleaned match without symbols (e.g. "look 1" or "look1" matches "LOOK N#1")
+    if (queryClean && cleanTitle.includes(queryClean)) return true;
 
-    // 3. Number match (e.g. typing "9" or "look 9" matches number 9)
-    if (digitsOnly && (lookNumber === digitsOnly || lookNumber.includes(digitsOnly))) return true;
+    // 3. Number match (e.g. typing "1" or "01" matches look.number === 1)
+    if (queryDigits && (lookNumberStr === queryDigits || lookNumberStr.includes(queryDigits))) return true;
 
-    // 4. Match inside pieces (shein code, title, url)
+    // 4. Sub-pieces match (Shein code, piece name, url)
     if (Array.isArray(look.pieces)) {
       const pieceFound = look.pieces.some(p => {
         if (!p) return false;
         const pTitle = String(p.title || '').toLowerCase();
         const pCode = String(p.sheinCode || '').toLowerCase();
         const pUrl = String(p.sheinUrl || '').toLowerCase();
-        return pTitle.includes(rawTerm) || pCode.includes(rawTerm) || pUrl.includes(rawTerm);
+        return pTitle.includes(query) || pCode.includes(query) || pUrl.includes(query);
       });
       if (pieceFound) return true;
     }
@@ -111,20 +111,28 @@ export default function Home({ looks, onSelectLook }) {
           Links diretos de compra na Shein para todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
         </p>
 
-        {/* Search Bar */}
-        <div style={{ 
-          maxWidth: '480px', 
-          margin: '0 auto',
-          position: 'relative'
-        }}>
+        {/* Search Bar Form */}
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            const gridEl = document.getElementById('looks-grid-header');
+            if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
+          }}
+          style={{ 
+            maxWidth: '480px', 
+            margin: '0 auto',
+            position: 'relative'
+          }}
+        >
           <Search 
             size={18} 
             color="var(--text-muted)" 
             style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} 
           />
           <input 
-            type="text"
-            placeholder="Buscar por nº do Look (ex: LOOK N#9)..."
+            type="search"
+            enterKeyHint="search"
+            placeholder="Buscar por nº do Look (ex: 1, LOOK N#1)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -143,6 +151,7 @@ export default function Home({ looks, onSelectLook }) {
           />
           {searchTerm && (
             <button 
+              type="button"
               onClick={() => setSearchTerm('')}
               style={{
                 position: 'absolute',
@@ -159,18 +168,21 @@ export default function Home({ looks, onSelectLook }) {
               ✕ Limpar
             </button>
           )}
-        </div>
+        </form>
       </div>
 
       {/* Looks Grid Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '20px',
-        paddingBottom: '10px',
-        borderBottom: '1px solid var(--border-light)'
-      }}>
+      <div 
+        id="looks-grid-header"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          paddingBottom: '10px',
+          borderBottom: '1px solid var(--border-light)'
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Grid size={16} color="var(--text-muted)" />
           <h2 style={{ 
@@ -179,7 +191,7 @@ export default function Home({ looks, onSelectLook }) {
             letterSpacing: '1px',
             color: '#ffffff'
           }}>
-            TODOS OS LOOKS ({filteredLooks.length})
+            {searchTerm ? `RESULTADOS DA BUSCA (${filteredLooks.length})` : `TODOS OS LOOKS (${filteredLooks.length})`}
           </h2>
         </div>
       </div>
@@ -204,14 +216,19 @@ export default function Home({ looks, onSelectLook }) {
           textAlign: 'center',
           padding: '60px 20px',
           background: 'var(--bg-card)',
-          borderRadius: 'var(--radius-md)',
+          borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-light)'
         }}>
-          <Star size={32} color="var(--text-muted)" style={{ margin: '0 auto 12px' }} />
-          <h3 style={{ fontSize: '1.1rem', marginBottom: '6px' }}>Nenhum look encontrado</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Tente buscar por outro termo ou limpar a barra de pesquisa.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '12px' }}>
+            Nenhum look encontrado para "{searchTerm}".
           </p>
+          <button 
+            onClick={() => setSearchTerm('')} 
+            className="y2k-btn-secondary"
+            style={{ fontSize: '0.8rem' }}
+          >
+            Ver Todos os Looks
+          </button>
         </div>
       )}
     </div>
