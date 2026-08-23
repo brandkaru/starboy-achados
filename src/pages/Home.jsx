@@ -25,44 +25,54 @@ export default function Home({ looks, onSelectLook }) {
   });
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 16px 60px' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 12px 60px' }}>
       
       {/* Hero Banner Section */}
-      <div style={{
-        textAlign: 'center',
-        padding: '48px 20px 40px',
-        marginBottom: '36px',
-        background: 'radial-gradient(circle at 50% 20%, rgba(255,255,255,0.06) 0%, transparent 70%)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-light)',
-        position: 'relative'
-      }}>
+      <div 
+        className="hero-container"
+        style={{
+          textAlign: 'center',
+          padding: '40px 16px 32px',
+          marginBottom: '28px',
+          background: 'radial-gradient(circle at 50% 20%, rgba(255,255,255,0.06) 0%, transparent 70%)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-light)',
+          position: 'relative',
+          overflow: 'hidden',
+          maxWidth: '100%'
+        }}
+      >
         {/* Star Icon Centered */}
-        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
-          <StarLogo size={110} color="#ffffff" />
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+          <StarLogo size={80} color="#ffffff" className="hero-star" />
         </div>
 
         {/* Main Title */}
-        <h1 style={{ 
-          fontFamily: 'var(--font-heading)', 
-          fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', 
-          fontWeight: 800,
-          letterSpacing: '2px',
-          color: '#ffffff',
-          textTransform: 'uppercase',
-          marginBottom: '6px',
-          lineHeight: 1.1
-        }}>
+        <h1 
+          className="hero-title"
+          style={{ 
+            fontFamily: 'var(--font-heading)', 
+            fontSize: 'clamp(1.4rem, 4vw, 2.5rem)', 
+            fontWeight: 800,
+            letterSpacing: '1.5px',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            marginBottom: '4px',
+            lineHeight: 1.15,
+            maxWidth: '100%',
+            wordBreak: 'break-word'
+          }}
+        >
           STARBOY STREETWEAR
         </h1>
 
         {/* Subtitle */}
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.85rem',
-          letterSpacing: '4px',
+          fontSize: '0.8rem',
+          letterSpacing: '3px',
           color: 'var(--text-muted)',
-          marginBottom: '20px',
+          marginBottom: '16px',
           textTransform: 'uppercase'
         }}>
           ACHADOS SHEIN
@@ -71,8 +81,8 @@ export default function Home({ looks, onSelectLook }) {
         <p style={{ 
           color: 'var(--text-muted)', 
           maxWidth: '520px', 
-          margin: '0 auto 28px', 
-          fontSize: '0.9rem',
+          margin: '0 auto 24px', 
+          fontSize: '0.85rem',
           lineHeight: 1.5
         }}>
           Encontre os links diretos de todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
@@ -96,12 +106,12 @@ export default function Home({ looks, onSelectLook }) {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
-              padding: '14px 16px 14px 46px',
+              padding: '12px 16px 12px 46px',
               background: 'rgba(15, 15, 20, 0.9)',
               border: '1px solid var(--border-light)',
               borderRadius: '30px',
               color: '#ffffff',
-              fontSize: '0.9rem',
+              fontSize: '0.85rem',
               outline: 'none',
               fontFamily: 'var(--font-body)',
               boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
@@ -142,7 +152,7 @@ export default function Home({ looks, onSelectLook }) {
           <Grid size={16} color="var(--text-muted)" />
           <h2 style={{ 
             fontFamily: 'var(--font-mono)', 
-            fontSize: '0.9rem', 
+            fontSize: '0.85rem', 
             letterSpacing: '1px',
             color: '#ffffff'
           }}>
@@ -159,8 +169,8 @@ export default function Home({ looks, onSelectLook }) {
       {filteredLooks.length > 0 ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-          gap: '20px'
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gap: '14px'
         }}>
           {filteredLooks.map((look) => (
             <LookCard 
