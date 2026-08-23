@@ -40,48 +40,66 @@ export default function Admin({ looks, setLooks }) {
     }
   };
 
-  // Single Image File Handler
-  const handleImageUpload = (file, callback) => {
-    if (file) {
+  // Canvas Image Compression Helper (Reduces 10MB phone camera photos to ~40KB)
+  const compressImage = (file, maxWidth = 800, quality = 0.75) => {
+    return new Promise((resolve) => {
+      if (!file || typeof file === 'string') return resolve(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        callback(reader.result);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
       };
+      reader.onerror = () => resolve('');
       reader.readAsDataURL(file);
+    });
+  };
+
+  // Single Image File Handler with Auto Compression
+  const handleImageUpload = async (file, callback) => {
+    if (file) {
+      const compressed = await compressImage(file);
+      callback(compressed);
     }
   };
 
-  // BATCH MULTIPLE IMAGES UPLOAD HANDLER
-  const handleBatchImageUpload = (files) => {
+  // BATCH MULTIPLE IMAGES UPLOAD HANDLER WITH AUTO COMPRESSION
+  const handleBatchImageUpload = async (files) => {
     if (!files || files.length === 0) return;
 
     const fileArray = Array.from(files);
-    const readPromises = fileArray.map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
-    });
+    const compressedImages = await Promise.all(fileArray.map(file => compressImage(file)));
 
-    Promise.all(readPromises).then((images) => {
-      if (images.length > 0) {
-        setCoverImage(images[0]);
+    if (compressedImages.length > 0) {
+      setCoverImage(compressedImages[0]);
 
-        if (images.length > 1) {
-          const newPieces = images.slice(1).map((imgUrl, idx) => ({
-            id: `batch-${Date.now()}-${idx}`,
-            title: `Peça #${idx + 1}`,
-            sheinCode: '',
-            sheinUrl: '',
-            image: imgUrl
-          }));
-          setPieces(newPieces);
-        } else {
-          setPieces([{ id: '1', title: 'Peça #1', sheinCode: '', sheinUrl: '', image: '' }]);
-        }
+      if (compressedImages.length > 1) {
+        const newPieces = compressedImages.slice(1).map((imgUrl, idx) => ({
+          id: `batch-${Date.now()}-${idx}`,
+          title: `Peça #${idx + 1}`,
+          sheinCode: '',
+          sheinUrl: '',
+          image: imgUrl
+        }));
+        setPieces(newPieces);
+      } else {
+        setPieces([{ id: '1', title: 'Peça #1', sheinCode: '', sheinUrl: '', image: '' }]);
       }
-    });
+    }
   };
 
   // Swap Cover with a Piece Photo in 1-click

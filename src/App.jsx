@@ -57,10 +57,18 @@ export default function App() {
   // Auto-sync with Cloud Database on mount & tab focus
   useEffect(() => {
     const syncCloud = async () => {
-      const cloudLooks = await getCloudLooks();
-      if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
-        setLooks(cloudLooks);
-        localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));
+      try {
+        const cloudLooks = await getCloudLooks();
+        if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
+          setLooks(cloudLooks);
+          try {
+            localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));
+          } catch (e) {
+            console.warn('QuotaExceeded storage warning:', e);
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao sincronizar na nuvem:', err);
       }
     };
 
@@ -69,9 +77,13 @@ export default function App() {
     return () => window.removeEventListener('focus', syncCloud);
   }, []);
 
-  // Save looks to localStorage on state update
+  // Save looks to localStorage on state update safely
   useEffect(() => {
-    localStorage.setItem('starboy_looks', JSON.stringify(looks));
+    try {
+      localStorage.setItem('starboy_looks', JSON.stringify(looks));
+    } catch (e) {
+      console.warn('QuotaExceeded storage warning:', e);
+    }
   }, [looks]);
 
   const handleSelectLook = (look) => {
