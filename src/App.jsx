@@ -20,15 +20,34 @@ export default function App() {
   });
 
   const [selectedLook, setSelectedLook] = useState(null);
+
+  // Helper to filter out any look registered in starboy_deleted_looks
+  const filterDeleted = (looksList) => {
+    if (!Array.isArray(looksList)) return [];
+    try {
+      const deletedIds = JSON.parse(localStorage.getItem('starboy_deleted_looks') || '[]');
+      if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+        return looksList.filter(l => 
+          !deletedIds.includes(String(l.id)) && 
+          !deletedIds.includes(String(l.number))
+        );
+      }
+    } catch (e) {
+      console.error('Error reading deleted looks:', e);
+    }
+    return looksList;
+  };
   
-  // Smart Initial State: Always merges server INITIAL_LOOKS with local cache so all devices get all looks
+  // Smart Initial State: Always merges server INITIAL_LOOKS with local cache and filters out deleted looks
   const [looks, setLooks] = useState(() => {
     let serverLooks = Array.isArray(INITIAL_LOOKS) ? INITIAL_LOOKS : [];
     const saved = localStorage.getItem('starboy_looks');
+    let finalLooks = serverLooks;
+
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           const mergedMap = new Map();
           serverLooks.forEach(l => mergedMap.set(String(l.number || l.id), l));
           parsed.forEach(l => {
@@ -37,13 +56,14 @@ export default function App() {
               mergedMap.set(key, l);
             }
           });
-          return Array.from(mergedMap.values()).sort((a, b) => (Number(b.number) || 0) - (Number(a.number) || 0));
+          finalLooks = Array.from(mergedMap.values()).sort((a, b) => (Number(b.number) || 0) - (Number(a.number) || 0));
         }
       } catch (e) {
         console.error('Erro ao ler localStorage', e);
       }
     }
-    return serverLooks;
+
+    return filterDeleted(finalLooks);
   });
 
   // Deep link detection for specific look URLs (?look=2 or #look-2)
@@ -98,9 +118,10 @@ export default function App() {
       try {
         const cloudLooks = await getCloudLooks();
         if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
-          setLooks(cloudLooks);
+          const activeCloudLooks = filterDeleted(cloudLooks);
+          setLooks(activeCloudLooks);
           try {
-            localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));
+            localStorage.setItem('starboy_looks', JSON.stringify(activeCloudLooks));
           } catch (e) {
             console.warn('QuotaExceeded storage warning:', e);
           }

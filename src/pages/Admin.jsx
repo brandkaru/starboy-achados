@@ -210,7 +210,28 @@ export default function Admin({ looks, setLooks }) {
   const handleDelete = (id) => {
     if (confirm('Tem certeza que deseja excluir este Look?')) {
       const targetLook = looks.find(l => l.id === id);
-      setLooks(looks.filter(l => l.id !== id));
+      const updated = looks.filter(l => l.id !== id);
+      setLooks(updated);
+
+      // Persist deleted ID and Number in localStorage so sync won't resurrect it
+      try {
+        const savedDeleted = JSON.parse(localStorage.getItem('starboy_deleted_looks') || '[]');
+        if (targetLook) {
+          if (targetLook.id && !savedDeleted.includes(String(targetLook.id))) {
+            savedDeleted.push(String(targetLook.id));
+          }
+          if (targetLook.number && !savedDeleted.includes(String(targetLook.number))) {
+            savedDeleted.push(String(targetLook.number));
+          }
+        } else if (!savedDeleted.includes(String(id))) {
+          savedDeleted.push(String(id));
+        }
+        localStorage.setItem('starboy_deleted_looks', JSON.stringify(savedDeleted));
+        localStorage.setItem('starboy_looks', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Erro ao guardar excluidos:', e);
+      }
+
       if (targetLook) {
         deleteLookFromCloud(targetLook._id || targetLook.id);
       }
