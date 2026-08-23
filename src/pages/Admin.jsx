@@ -4,6 +4,7 @@ import {
   Lock, Unlock, Check, Copy, ImageIcon, 
   Sparkles, Star 
 } from '../components/Icons';
+import { saveLookToCloud, deleteLookFromCloud } from '../services/cloudDb';
 
 export default function Admin({ looks, setLooks }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -150,11 +151,13 @@ export default function Admin({ looks, setLooks }) {
       setLooks(looks.map(l => l.id === editingId ? newLook : l));
       setIsEditing(false);
       setEditingId(null);
-      alert('Look atualizado com sucesso! ✦');
+      saveLookToCloud(newLook);
+      alert('Look atualizado com sucesso no banco de dados na Nuvem! ✦');
     } else {
       setLooks([newLook, ...looks]);
       setSelectedAutomationLookId(createdLookId);
-      alert('Novo Look publicado com sucesso! ✦');
+      saveLookToCloud(newLook);
+      alert('Novo Look publicado com sucesso no banco de dados na Nuvem! ✦');
     }
 
     resetForm();
@@ -188,7 +191,11 @@ export default function Admin({ looks, setLooks }) {
   // Delete Look
   const handleDelete = (id) => {
     if (confirm('Tem certeza que deseja excluir este Look?')) {
+      const targetLook = looks.find(l => l.id === id);
       setLooks(looks.filter(l => l.id !== id));
+      if (targetLook) {
+        deleteLookFromCloud(targetLook._id || targetLook.id);
+      }
     }
   };
 

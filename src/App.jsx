@@ -5,7 +5,7 @@ import LookDetail from './pages/LookDetail';
 import Admin from './pages/Admin';
 import { INITIAL_LOOKS } from './data/initialData';
 import { Instagram, ArrowUp } from './components/Icons';
-import { fetchCloudLooks } from './services/cloudDb';
+import { getCloudLooks } from './services/cloudDb';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'look_detail' | 'admin'
@@ -27,7 +27,7 @@ export default function App() {
 
   // Auto-sync with Cloud Database on mount
   useEffect(() => {
-    fetchCloudLooks().then(cloudLooks => {
+    getCloudLooks().then(cloudLooks => {
       if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
         setLooks(cloudLooks);
         localStorage.setItem('starboy_looks', JSON.stringify(cloudLooks));

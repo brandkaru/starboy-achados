@@ -1,34 +1,78 @@
-// STARBOY STREETWEAR - CLOUD DATABASE AUTOMATION SERVICE
-// Syncs looks data to Cloud so every device (mobile, PC, tablet) sees identical real-time updates!
+// STARBOY STREETWEAR - AUTOMATIC REAL-TIME CLOUD DATABASE SERVICE
+// 100% Fully Automatic: Saves & Loads directly from Cloud REST DB on any device!
 
-const CLOUD_RAW_URL = 'https://raw.githubusercontent.com/brandkaru/starboy-achados/main/src/data/initialData.js';
+const CLOUD_API_ENDPOINT = 'https://crudcrud.com/api/2943bddac47543099696bb84a1feb9ba/looks';
 
 /**
- * Fetch live looks from the Cloud Database
+ * Fetch all live looks from the Cloud DB
  */
-export async function fetchCloudLooks() {
+export async function getCloudLooks() {
   try {
-    const res = await fetch(CLOUD_RAW_URL + '?t=' + Date.now());
+    const res = await fetch(CLOUD_API_ENDPOINT);
     if (res.ok) {
-      const text = await res.text();
-      // Extract array from export const INITIAL_LOOKS = [...]
-      const match = text.match(/INITIAL_LOOKS\s*=\s*([\s\S]*?);/);
-      if (match && match[1]) {
-        const parsed = JSON.parse(match[1]);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        return data.map(item => ({
+          ...item,
+          id: item.id || item._id || `look-${item.number}`
+        }));
       }
     }
   } catch (err) {
-    console.warn('Cloud DB sync offline, using local state:', err);
+    console.warn('Erro ao buscar dados na nuvem:', err);
   }
   return null;
 }
 
 /**
- * Generate formatted initialData.js content for Cloud deployment
+ * Automatically push a new look to the Cloud DB
  */
-export function generateCloudDataJS(looks) {
-  return `// STARBOY STREETWEAR - CLOUD DATABASE SOURCE OF TRUTH\nexport const INITIAL_LOOKS = ${JSON.stringify(looks, null, 2)};\n`;
+export async function saveLookToCloud(look) {
+  try {
+    const payload = {
+      number: Number(look.number),
+      title: look.title,
+      subtitle: look.subtitle || '',
+      coverImage: look.coverImage,
+      createdAt: look.createdAt || new Date().toISOString().split('T')[0],
+      pieces: (look.pieces || []).map(p => ({
+        id: p.id,
+        title: p.title || '',
+        sheinCode: p.sheinCode || '',
+        sheinUrl: p.sheinUrl || '',
+        image: p.image || ''
+      }))
+    };
+
+    const res = await fetch(CLOUD_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const savedData = await res.json();
+      console.log('✦ Look salvo na nuvem com sucesso:', savedData);
+      return savedData;
+    }
+  } catch (err) {
+    console.error('Erro ao salvar na nuvem:', err);
+  }
+  return null;
+}
+
+/**
+ * Delete a look from Cloud DB
+ */
+export async function deleteLookFromCloud(cloudId) {
+  if (!cloudId) return;
+  try {
+    await fetch(`${CLOUD_API_ENDPOINT}/${cloudId}`, {
+      method: 'DELETE'
+    });
+  } catch (err) {
+    console.error('Erro ao excluir da nuvem:', err);
+  }
 }
