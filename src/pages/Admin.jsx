@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Plus, Trash2, Edit2, Download, 
-  Lock, Unlock, Check, ImageIcon, 
+  Lock, Unlock, Check, Copy, ImageIcon, 
   Sparkles, Star 
 } from '../components/Icons';
 
@@ -23,6 +23,10 @@ export default function Admin({ looks, setLooks }) {
   const [pieces, setPieces] = useState([
     { id: '1', title: '', sheinCode: '', sheinUrl: '', image: '' }
   ]);
+
+  // Meta Automation Texts Copy Feedback
+  const [copiedType, setCopiedType] = useState(null);
+  const [selectedAutomationLookId, setSelectedAutomationLookId] = useState(looks[0]?.id || '');
 
   // Handle PIN Login (Default PIN: "starboy")
   const handleLogin = (e) => {
@@ -61,22 +65,19 @@ export default function Admin({ looks, setLooks }) {
 
     Promise.all(readPromises).then((images) => {
       if (images.length > 0) {
-        // Set the 1st photo as Cover by default
         setCoverImage(images[0]);
 
-        // Set remaining photos as Pieces
         if (images.length > 1) {
           const newPieces = images.slice(1).map((imgUrl, idx) => ({
             id: `batch-${Date.now()}-${idx}`,
             title: `Peça #${idx + 1}`,
             sheinCode: '',
             sheinUrl: '',
-            image: imgUrl,
-            category: 'Streetwear'
+            image: imgUrl
           }));
           setPieces(newPieces);
         } else {
-          setPieces([{ id: '1', title: 'Peça #1', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
+          setPieces([{ id: '1', title: 'Peça #1', sheinCode: '', sheinUrl: '', image: '' }]);
         }
       }
     });
@@ -87,7 +88,6 @@ export default function Admin({ looks, setLooks }) {
     const currentCover = coverImage;
     const selectedPieceImage = pieces[pieceIndex].image;
 
-    // Swap cover image with the piece's image
     setCoverImage(selectedPieceImage);
 
     const updatedPieces = [...pieces];
@@ -101,7 +101,7 @@ export default function Admin({ looks, setLooks }) {
   const addPieceRow = () => {
     setPieces([
       ...pieces,
-      { id: Date.now().toString(), title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }
+      { id: Date.now().toString(), title: '', sheinCode: '', sheinUrl: '', image: '' }
     ]);
   };
 
@@ -128,8 +128,9 @@ export default function Admin({ looks, setLooks }) {
       return;
     }
 
+    const createdLookId = isEditing ? editingId : `look-${Date.now()}`;
     const newLook = {
-      id: isEditing ? editingId : `look-${Date.now()}`,
+      id: createdLookId,
       number: Number(lookNumber),
       title: lookTitle || `LOOK N#${lookNumber}`,
       subtitle: lookSubtitle,
@@ -141,8 +142,7 @@ export default function Admin({ looks, setLooks }) {
         title: p.title || `Peça #${idx + 1}`,
         sheinCode: p.sheinCode?.trim() || '',
         sheinUrl: p.sheinUrl?.trim() || (p.sheinCode ? `https://www.shein.com/search?keyword=${p.sheinCode}` : ''),
-        image: p.image || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
-        category: p.category || 'Streetwear'
+        image: p.image || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop'
       }))
     };
 
@@ -153,6 +153,7 @@ export default function Admin({ looks, setLooks }) {
       alert('Look atualizado com sucesso! ✦');
     } else {
       setLooks([newLook, ...looks]);
+      setSelectedAutomationLookId(createdLookId);
       alert('Novo Look publicado com sucesso! ✦');
     }
 
@@ -164,9 +165,9 @@ export default function Admin({ looks, setLooks }) {
     setLookNumber(nextNum);
     setLookTitle(`LOOK N#${nextNum}`);
     setLookSubtitle('');
-    setLookCategory('Streetwear');
+    setLookCategory('');
     setCoverImage('');
-    setPieces([{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
+    setPieces([{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '' }]);
     setIsEditing(false);
     setEditingId(null);
   };
@@ -178,9 +179,9 @@ export default function Admin({ looks, setLooks }) {
     setLookNumber(look.number);
     setLookTitle(look.title);
     setLookSubtitle(look.subtitle || '');
-    setLookCategory(look.category || 'Streetwear');
+    setLookCategory(look.category || '');
     setCoverImage(look.coverImage);
-    setPieces(look.pieces?.length > 0 ? look.pieces : [{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '', category: 'Streetwear' }]);
+    setPieces(look.pieces?.length > 0 ? look.pieces : [{ id: '1', title: '', sheinCode: '', sheinUrl: '', image: '' }]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -201,6 +202,40 @@ export default function Admin({ looks, setLooks }) {
     downloadAnchor.click();
     downloadAnchor.remove();
   };
+
+  // Generate Automation Text for DM
+  const getAutomationDMText = (targetLook) => {
+    if (!targetLook) return '';
+    const siteUrl = window.location.origin;
+    
+    // Construct piece links list if available
+    let piecesListText = '';
+    if (targetLook.pieces && targetLook.pieces.length > 0) {
+      piecesListText = targetLook.pieces
+        .filter(p => p.sheinUrl)
+        .map((p, i) => `▪ Peça ${i + 1}: ${p.sheinUrl}`)
+        .join('\n');
+    }
+
+    return `Oii! Tudo bem? ✦ Aqui estão os links das peças do ${targetLook.title || `LOOK N#${targetLook.number}`}:\n\n` +
+      (piecesListText ? `${piecesListText}\n\n` : '') +
+      `🔗 Veja todas as peças com fotos no site:\n${siteUrl}\n\n✦ STARBOY STREETWEAR`;
+  };
+
+  // Generate Automation Text for Instagram Public Comments Reply
+  const getAutomationCommentText = (targetLook) => {
+    if (!targetLook) return '';
+    return `Oii! ✦ Acabei de enviar os links do ${targetLook.title || `LOOK N#${targetLook.number}`} direto no seu Direct! Confere lá nas suas DMs 📥✨`;
+  };
+
+  // Copy helper
+  const handleCopyAutomation = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedType(key);
+    setTimeout(() => setCopiedType(null), 2500);
+  };
+
+  const activeAutomationLook = looks.find(l => l.id === selectedAutomationLookId) || looks[0];
 
   // Lock Screen Render
   if (!isAuthenticated) {
@@ -232,7 +267,7 @@ export default function Admin({ looks, setLooks }) {
           PAINEL DE ADMINISTRAÇÃO
         </h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '24px' }}>
-          Área exclusiva para postar novos looks e atualizar os links dos produtos Shein.
+          Área exclusiva para postar novos looks e gerenciar links e automações.
         </p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -286,7 +321,7 @@ export default function Admin({ looks, setLooks }) {
         <div>
           <div className="star-badge" style={{ marginBottom: '6px' }}>✦ PAINEL ADMINISTRATIVO</div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', letterSpacing: '1px' }}>
-            GERENCIADOR DE LOOKS & LINKS
+            GERENCIADOR DE LOOKS & AUTOMAÇÕES
           </h1>
         </div>
 
@@ -398,7 +433,8 @@ export default function Admin({ looks, setLooks }) {
                   color: '#ffffff'
                 }}
               />
-            </div>          </div>
+            </div>
+          </div>
 
           {/* Subtitle */}
           <div>
@@ -440,7 +476,6 @@ export default function Admin({ looks, setLooks }) {
             </div>
 
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-              {/* Cover Preview Box 4:5 */}
               <div style={{ width: '120px' }} className="aspect-4-5">
                 {coverImage ? (
                   <img src={coverImage} alt="Capa Preview" />
@@ -487,7 +522,7 @@ export default function Admin({ looks, setLooks }) {
                   PEÇAS DO LOOK ({pieces.length})
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Defina o nome, o código/ID e o link de compra da Shein para cada peça:
+                  Cole o link de compra da Shein para cada peça:
                 </span>
               </div>
 
@@ -524,7 +559,6 @@ export default function Admin({ looks, setLooks }) {
                         PEÇA #{index + 1}
                       </span>
 
-                      {/* Button to Set this Piece Photo as Cover */}
                       {piece.image && (
                         <button
                           type="button"
@@ -559,7 +593,6 @@ export default function Admin({ looks, setLooks }) {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {/* Shein Product URL */}
                     <div>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontFamily: 'var(--font-mono)' }}>
                         LINK DA SHEIN (COLE O LINK DA PEÇA AQUI)
@@ -583,7 +616,6 @@ export default function Admin({ looks, setLooks }) {
                     </div>
                   </div>
 
-                  {/* Piece Photo Thumbnail */}
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
                     <div style={{ width: '70px' }} className="aspect-4-5">
                       {piece.image ? (
@@ -639,6 +671,191 @@ export default function Admin({ looks, setLooks }) {
         </form>
       </div>
 
+      {/* NEW FEATURE: META BUSINESS AUTOMATION TEXT GENERATOR */}
+      {looks.length > 0 && (
+        <div style={{
+          background: 'var(--bg-card)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-light)',
+          padding: '28px',
+          marginBottom: '40px',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'rgba(255,255,255,0.1)',
+                padding: '8px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Sparkles size={20} color="#ffffff" />
+              </div>
+              <div>
+                <div className="star-badge" style={{ fontSize: '0.65rem', marginBottom: '4px' }}>⚡ META BUSINESS & INSTAGRAM AUTOMATION</div>
+                <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', letterSpacing: '1px' }}>
+                  GERADOR DE TEXTOS PARA COPIAR & COLAR
+                </h2>
+              </div>
+            </div>
+
+            {/* Select Target Look */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>LOOK:</span>
+              <select
+                value={selectedAutomationLookId}
+                onChange={(e) => setSelectedAutomationLookId(e.target.value)}
+                style={{
+                  padding: '8px 14px',
+                  background: 'rgba(0,0,0,0.6)',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#ffffff',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.85rem'
+                }}
+              >
+                {looks.map(l => (
+                  <option key={l.id} value={l.id}>
+                    {l.title || `LOOK N#${l.number}`} ({l.pieces?.length || 0} peças)
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {activeAutomationLook && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+              
+              {/* TEXT 1: DIRECT MESSAGE (DM) */}
+              <div style={{
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: '18px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.85rem', color: '#ffffff' }}>
+                    1️⃣ MENSAGEM PRIVADA NA DM (DIRECT)
+                  </span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Meta Auto-Reply DM</span>
+                </div>
+
+                <textarea
+                  readOnly
+                  rows={6}
+                  value={getAutomationDMText(activeAutomationLook)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'rgba(15,15,20,0.9)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: '#e2e8f0',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8rem',
+                    lineHeight: 1.4,
+                    resize: 'none',
+                    outline: 'none'
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => handleCopyAutomation(getAutomationDMText(activeAutomationLook), 'dm')}
+                  className="y2k-btn"
+                  style={{
+                    fontSize: '0.8rem',
+                    padding: '10px 16px',
+                    background: copiedType === 'dm' ? '#22c55e' : '#ffffff',
+                    borderColor: copiedType === 'dm' ? '#22c55e' : '#ffffff'
+                  }}
+                >
+                  {copiedType === 'dm' ? (
+                    <>
+                      <Check size={14} color="#000000" />
+                      <span>TEXTO DA DM COPIADO! ✦</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} />
+                      <span>COPIAR MENSAGEM DA DM</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* TEXT 2: PUBLIC COMMENT REPLY */}
+              <div style={{
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: '18px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.85rem', color: '#ffffff' }}>
+                    2️⃣ RESPOSTA NOS COMENTÁRIOS DO POST
+                  </span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Meta Comment Reply</span>
+                </div>
+
+                <textarea
+                  readOnly
+                  rows={6}
+                  value={getAutomationCommentText(activeAutomationLook)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'rgba(15,15,20,0.9)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: '#e2e8f0',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8rem',
+                    lineHeight: 1.4,
+                    resize: 'none',
+                    outline: 'none'
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => handleCopyAutomation(getAutomationCommentText(activeAutomationLook), 'comment')}
+                  className="y2k-btn"
+                  style={{
+                    fontSize: '0.8rem',
+                    padding: '10px 16px',
+                    background: copiedType === 'comment' ? '#22c55e' : '#ffffff',
+                    borderColor: copiedType === 'comment' ? '#22c55e' : '#ffffff'
+                  }}
+                >
+                  {copiedType === 'comment' ? (
+                    <>
+                      <Check size={14} color="#000000" />
+                      <span>RESPOSTA COPIADA! ✦</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} />
+                      <span>COPIAR RESPOSTA DOS COMENTÁRIOS</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Existing Looks Management List */}
       <div style={{
         background: 'var(--bg-card)',
@@ -681,7 +898,20 @@ export default function Admin({ looks, setLooks }) {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button 
+                  onClick={() => {
+                    setSelectedAutomationLookId(look.id);
+                    window.scrollTo({ top: 450, behavior: 'smooth' });
+                  }} 
+                  className="y2k-btn-secondary"
+                  style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                  title="Gerar textos de automação para este Look"
+                >
+                  <Sparkles size={12} />
+                  <span>GERAR TEXTOS META</span>
+                </button>
+
                 <button 
                   onClick={() => handleEdit(look)} 
                   className="y2k-btn-secondary"
