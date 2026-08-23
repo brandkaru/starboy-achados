@@ -6,6 +6,7 @@ import Admin from './pages/Admin';
 import { INITIAL_LOOKS } from './data/initialData';
 import { Instagram, ArrowUp } from './components/Icons';
 import { getCloudLooks } from './services/cloudDb';
+import StarLogo from './components/StarLogo';
 
 export default function App() {
   // Secret routing check: URL hash #admin or path /admin
@@ -159,11 +160,11 @@ export default function App() {
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <StarLogo size={42} color="#ffffff" />
             <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '2px', fontSize: '1.1rem' }}>
               STARBOY STREETWEAR
             </span>
-            <span style={{ fontSize: '1rem' }}>✦</span>
           </div>
 
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '400px' }}>

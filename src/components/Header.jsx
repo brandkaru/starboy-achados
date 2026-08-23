@@ -1,5 +1,5 @@
 import React from 'react';
-import { Instagram, Home, ArrowLeft } from './Icons';
+import { Instagram, ArrowLeft } from './Icons';
 import StarLogo from './StarLogo';
 
 export default function Header({ currentView, setCurrentView, looksCount }) {
@@ -9,7 +9,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
       top: 0,
       zIndex: 100,
       borderBottom: '1px solid var(--border-light)',
-      padding: '12px 20px'
+      padding: '10px 16px'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -17,7 +17,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        flexWrap: 'wrap',
+        flexWrap: 'nowrap',
         gap: '12px'
       }}>
         {/* Brand Logo & Name Section */}
@@ -26,12 +26,12 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
           style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
           title="STARBOY STREETWEAR"
         >
-          <StarLogo size={36} color="#ffffff" />
+          <StarLogo size={32} color="#ffffff" />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <span style={{ 
               fontFamily: 'var(--font-heading)', 
-              fontSize: '1.05rem', 
+              fontSize: '0.95rem', 
               fontWeight: 800, 
               letterSpacing: '1px', 
               color: '#ffffff',
@@ -41,7 +41,7 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
             </span>
             <span style={{ 
               fontFamily: 'var(--font-mono)', 
-              fontSize: '0.6rem', 
+              fontSize: '0.58rem', 
               letterSpacing: '2px', 
               color: 'var(--text-muted)',
               textTransform: 'uppercase'
@@ -51,8 +51,8 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
           </div>
         </div>
 
-        {/* Right Section: Instagram & Admin Back Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Right Section: Instagram Icon Only on Mobile */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           {currentView === 'admin' ? (
             <button 
               onClick={() => {
@@ -60,33 +60,34 @@ export default function Header({ currentView, setCurrentView, looksCount }) {
                 setCurrentView('home');
               }}
               className="y2k-btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '6px 14px' }}
+              style={{ fontSize: '0.75rem', padding: '6px 12px' }}
             >
               <ArrowLeft size={13} />
-              <span>VOLTAR AO SITE</span>
+              <span>VOLTAR</span>
             </button>
           ) : (
             <a 
               href="https://instagram.com/starboy_brazil" 
               target="_blank" 
               rel="noopener noreferrer"
+              aria-label="Instagram @starboy_brazil"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                color: 'var(--accent-chrome)',
+                justifyContent: 'center',
+                color: '#ffffff',
                 textDecoration: 'none',
-                fontSize: '0.8rem',
-                fontFamily: 'var(--font-mono)',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.2s ease'
+                padding: '8px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                transition: 'all 0.2s ease',
+                width: '38px',
+                height: '38px'
               }}
+              title="@starboy_brazil no Instagram"
             >
-              <Instagram size={14} color="#e2e8f0" />
-              <span>@starboy_brazil</span>
+              <Instagram size={18} color="#ffffff" />
             </a>
           )}
         </div>
