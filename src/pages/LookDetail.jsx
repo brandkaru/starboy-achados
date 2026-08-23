@@ -11,8 +11,8 @@ export default function LookDetail({ look, onBack }) {
     e?.preventDefault();
     e?.stopPropagation();
 
-    const cleanOrigin = window.location.origin;
-    const shareUrl = `${cleanOrigin}`;
+    const lookRef = look.number || look.id;
+    const shareUrl = `${window.location.origin}/?look=${lookRef}`;
 
     if (navigator.share) {
       try {
@@ -23,7 +23,7 @@ export default function LookDetail({ look, onBack }) {
         });
         return;
       } catch (err) {
-        // User cancelled or share failed, fallback to copy
+        // User cancelled native share modal
       }
     }
 
@@ -66,7 +66,7 @@ export default function LookDetail({ look, onBack }) {
           {shareCopied ? (
             <>
               <Check size={14} color="#4ade80" />
-              <span style={{ color: '#4ade80' }}>LINK COPIADO! ✦</span>
+              <span style={{ color: '#4ade80' }}>LINK DO LOOK COPIADO! ✦</span>
             </>
           ) : (
             <>

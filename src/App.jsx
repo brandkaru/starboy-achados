@@ -35,15 +35,42 @@ export default function App() {
     return INITIAL_LOOKS;
   });
 
-  // Listen to hash/search changes for secret admin access (#sb96, #manage)
+  // Deep link detection for specific look URLs (?look=2 or #look-2)
+  useEffect(() => {
+    const checkDeepLink = () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const lookParam = searchParams.get('look') || searchParams.get('id');
+      const hashParam = window.location.hash.startsWith('#look-') ? window.location.hash.replace('#look-', '') : null;
+      
+      const targetRef = lookParam || hashParam;
+      if (targetRef && looks && looks.length > 0) {
+        const found = looks.find(l => 
+          String(l.number) === String(targetRef) || 
+          String(l.id) === String(targetRef) ||
+          String(l.id) === `look-${targetRef}`
+        );
+        if (found) {
+          setSelectedLook(found);
+          setCurrentView('look_detail');
+        }
+      }
+    };
+
+    checkDeepLink();
+  }, [looks]);
+
+  // Listen to hash/search changes for secret admin access & deep links
   useEffect(() => {
     const handleLocationChange = () => {
       const hash = window.location.hash;
       const search = window.location.search;
       if (hash === '#sb96' || hash === '#manage' || search.includes('key=sb96') || search.includes('admin=sb96')) {
         setCurrentView('admin');
-      } else if (!hash && !search.includes('key=')) {
-        if (currentView === 'admin') setCurrentView('home');
+      } else if (!hash && !search.includes('key=') && !search.includes('look=')) {
+        if (currentView === 'admin' || currentView === 'look_detail') {
+          setCurrentView('home');
+          setSelectedLook(null);
+        }
       }
     };
     window.addEventListener('hashchange', handleLocationChange);
@@ -89,12 +116,23 @@ export default function App() {
   const handleSelectLook = (look) => {
     setSelectedLook(look);
     setCurrentView('look_detail');
+    const lookRef = look.number || look.id;
+    try {
+      window.history.pushState(null, '', `?look=${lookRef}`);
+    } catch (e) {
+      window.location.hash = `look-${lookRef}`;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToHome = () => {
     setCurrentView('home');
     setSelectedLook(null);
+    try {
+      window.history.pushState(null, '', window.location.pathname);
+    } catch (e) {
+      window.location.hash = '';
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -109,12 +147,12 @@ export default function App() {
       <Header 
         currentView={currentView} 
         setCurrentView={(view) => {
-          setCurrentView(view);
           if (view === 'home') {
-            setSelectedLook(null);
-            window.location.hash = '';
+            handleBackToHome();
+          } else {
+            setCurrentView(view);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         looksCount={looks.length}
       />
