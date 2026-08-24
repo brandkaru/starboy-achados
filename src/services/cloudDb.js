@@ -90,13 +90,16 @@ export async function saveLookToCloud(look) {
         const data = await res.json();
         console.log('✦ Look salvo com sucesso na VPS Oracle:', data);
         return data;
+      } else {
+        const errText = await res.text();
+        console.error('Erro na resposta da VPS Oracle ao salvar:', res.status, errText);
       }
     } catch (err) {
-      console.error('Erro ao salvar na VPS Oracle:', err);
+      console.error('Erro de conexao ao salvar na VPS Oracle:', err);
     }
   }
 
-  return look;
+  return null;
 }
 
 /**

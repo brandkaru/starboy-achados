@@ -181,7 +181,7 @@ export default function Admin({ looks, setLooks }) {
   };
 
   // Submit Form (Create or Edit Look)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!coverImage) {
@@ -208,16 +208,28 @@ export default function Admin({ looks, setLooks }) {
     };
 
     if (isEditing) {
-      setLooks(looks.map(l => l.id === editingId ? newLook : l));
-      setIsEditing(false);
-      setEditingId(null);
-      saveLookToCloud(newLook);
-      alert('Look atualizado com sucesso no banco de dados na Nuvem! ✦');
+      const result = await saveLookToCloud(newLook);
+      if (result) {
+        setIsEditing(false);
+        setEditingId(null);
+        const cloudLooks = await getCloudLooks();
+        if (cloudLooks && Array.isArray(cloudLooks)) setLooks(cloudLooks);
+        alert('Look atualizado com sucesso no banco de dados na Nuvem! ✦');
+      } else {
+        alert('Erro ao salvar o look na nuvem. Verifique a conexão com a VPS Oracle!');
+        return;
+      }
     } else {
-      setLooks([newLook, ...looks]);
-      setSelectedAutomationLookId(createdLookId);
-      saveLookToCloud(newLook);
-      alert('Novo Look publicado com sucesso no banco de dados na Nuvem! ✦');
+      const result = await saveLookToCloud(newLook);
+      if (result) {
+        setSelectedAutomationLookId(createdLookId);
+        const cloudLooks = await getCloudLooks();
+        if (cloudLooks && Array.isArray(cloudLooks)) setLooks(cloudLooks);
+        alert('Novo Look publicado com sucesso no banco de dados na Nuvem! ✦');
+      } else {
+        alert('Erro ao salvar o look na nuvem. Verifique a conexão com a VPS Oracle!');
+        return;
+      }
     }
 
     resetForm();
