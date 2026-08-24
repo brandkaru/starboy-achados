@@ -1,7 +1,5 @@
-// STARBOY STREETWEAR - HYBRID REAL-TIME CLOUD DATABASE SERVICE
-// Connects directly to VPS Server, Cloud Database API, or GitHub Storage!
+// STARBOY STREETWEAR - SINGLE SOURCE OF TRUTH REAL-TIME CLOUD DATABASE SERVICE
 
-const DEFAULT_VPS_URL = 'https://api.zapgarcom.com.br/starboy-api';
 const DEFAULT_CLOUD_URL = 'https://raw.githubusercontent.com/brandkaru/starboy-achados/main/src/data/initialData.js';
 
 export function getVpsUrl() {
@@ -9,7 +7,13 @@ export function getVpsUrl() {
     const saved = localStorage.getItem('starboy_vps_url');
     if (saved !== null && saved !== '') return saved;
   } catch (e) {}
-  return DEFAULT_VPS_URL;
+  
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    if (window.location.origin.includes('starboybrazil.shop')) {
+      return window.location.origin;
+    }
+  }
+  return 'https://starboybrazil.shop';
 }
 
 export function setVpsUrl(url) {
@@ -30,7 +34,7 @@ export function setVpsUrl(url) {
 }
 
 /**
- * Fetch all live looks from VPS API or Cloud fallback
+ * Fetch all live looks from VPS API (Server is 100% Single Source of Truth)
  */
 export async function getCloudLooks() {
   const vpsUrl = getVpsUrl();
@@ -40,7 +44,7 @@ export async function getCloudLooks() {
       const res = await fetch(`${vpsUrl}/api/looks?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           console.log('✦ Live looks carregados da VPS Oracle em tempo real:', data.length);
           return data;
         }
@@ -58,7 +62,7 @@ export async function getCloudLooks() {
       const match = text.match(/INITIAL_LOOKS\s*=\s*([\s\S]*?);/);
       if (match && match[1]) {
         const parsed = JSON.parse(match[1]);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           return parsed;
         }
       }

@@ -9,6 +9,14 @@ import { getCloudLooks } from './services/cloudDb';
 import StarLogo from './components/StarLogo';
 
 export default function App() {
+  // Purge legacy local storage masks on startup so all browsers sync 100% with the Oracle VPS Server
+  useEffect(() => {
+    try {
+      localStorage.removeItem('starboy_deleted_looks');
+      localStorage.removeItem('starboy_looks');
+    } catch (e) {}
+  }, []);
+
   // Secret routing check: Only opens admin if URL has secret key #sb96, #manage, or ?key=sb96
   const [currentView, setCurrentView] = useState(() => {
     const hash = window.location.hash;
@@ -21,49 +29,9 @@ export default function App() {
 
   const [selectedLook, setSelectedLook] = useState(null);
 
-  // Helper to filter out any look registered in starboy_deleted_looks
-  const filterDeleted = (looksList) => {
-    if (!Array.isArray(looksList)) return [];
-    try {
-      const deletedIds = JSON.parse(localStorage.getItem('starboy_deleted_looks') || '[]');
-      if (Array.isArray(deletedIds) && deletedIds.length > 0) {
-        return looksList.filter(l => 
-          !deletedIds.includes(String(l.id)) && 
-          !deletedIds.includes(String(l.number))
-        );
-      }
-    } catch (e) {
-      console.error('Error reading deleted looks:', e);
-    }
-    return looksList;
-  };
-  
-  // Smart Initial State: Always merges server INITIAL_LOOKS with local cache and filters out deleted looks
+  // Pure Server Single Source of Truth State
   const [looks, setLooks] = useState(() => {
-    let serverLooks = Array.isArray(INITIAL_LOOKS) ? INITIAL_LOOKS : [];
-    const saved = localStorage.getItem('starboy_looks');
-    let finalLooks = serverLooks;
-
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          const mergedMap = new Map();
-          serverLooks.forEach(l => mergedMap.set(String(l.number || l.id), l));
-          parsed.forEach(l => {
-            const key = String(l.number || l.id);
-            if (!mergedMap.has(key)) {
-              mergedMap.set(key, l);
-            }
-          });
-          finalLooks = Array.from(mergedMap.values()).sort((a, b) => (Number(b.number) || 0) - (Number(a.number) || 0));
-        }
-      } catch (e) {
-        console.error('Erro ao ler localStorage', e);
-      }
-    }
-
-    return filterDeleted(finalLooks);
+    return Array.isArray(INITIAL_LOOKS) ? INITIAL_LOOKS : [];
   });
 
   // Deep link detection for specific look URLs (?look=2 or #look-2)
@@ -112,22 +80,16 @@ export default function App() {
     };
   }, [currentView]);
 
-  // Auto-sync with Cloud Database on mount & tab focus
+  // Auto-sync with Oracle VPS Server Cloud Database on mount & tab focus
   useEffect(() => {
     const syncCloud = async () => {
       try {
         const cloudLooks = await getCloudLooks();
-        if (cloudLooks && Array.isArray(cloudLooks) && cloudLooks.length > 0) {
-          const activeCloudLooks = filterDeleted(cloudLooks);
-          setLooks(activeCloudLooks);
-          try {
-            localStorage.setItem('starboy_looks', JSON.stringify(activeCloudLooks));
-          } catch (e) {
-            console.warn('QuotaExceeded storage warning:', e);
-          }
+        if (cloudLooks && Array.isArray(cloudLooks)) {
+          setLooks(cloudLooks);
         }
       } catch (err) {
-        console.warn('Erro ao sincronizar na nuvem:', err);
+        console.warn('Erro ao sincronizar com a VPS Oracle:', err);
       }
     };
 
@@ -135,15 +97,6 @@ export default function App() {
     window.addEventListener('focus', syncCloud);
     return () => window.removeEventListener('focus', syncCloud);
   }, []);
-
-  // Save looks to localStorage on state update safely
-  useEffect(() => {
-    try {
-      localStorage.setItem('starboy_looks', JSON.stringify(looks));
-    } catch (e) {
-      console.warn('QuotaExceeded storage warning:', e);
-    }
-  }, [looks]);
 
   const handleSelectLook = (look) => {
     setSelectedLook(look);
@@ -165,6 +118,10 @@ export default function App() {
     } catch (e) {
       window.location.hash = '';
     }
+    // Re-fetch from Oracle VPS Cloud DB on return to Home
+    getCloudLooks().then(cloudLooks => {
+      if (cloudLooks && Array.isArray(cloudLooks)) setLooks(cloudLooks);
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

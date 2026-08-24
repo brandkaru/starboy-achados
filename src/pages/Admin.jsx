@@ -249,33 +249,29 @@ export default function Admin({ looks, setLooks }) {
   };
 
   // Delete Look
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Tem certeza que deseja excluir este Look?')) {
-      const targetLook = looks.find(l => l.id === id);
-      const updated = looks.filter(l => l.id !== id);
+      const targetLook = looks.find(l => l.id === id || String(l.number) === String(id));
+      const updated = looks.filter(l => l.id !== id && String(l.number) !== String(id));
       setLooks(updated);
 
-      // Persist deleted ID and Number in localStorage so sync won't resurrect it
+      // Purge legacy local storage masks
       try {
-        const savedDeleted = JSON.parse(localStorage.getItem('starboy_deleted_looks') || '[]');
-        if (targetLook) {
-          if (targetLook.id && !savedDeleted.includes(String(targetLook.id))) {
-            savedDeleted.push(String(targetLook.id));
-          }
-          if (targetLook.number && !savedDeleted.includes(String(targetLook.number))) {
-            savedDeleted.push(String(targetLook.number));
-          }
-        } else if (!savedDeleted.includes(String(id))) {
-          savedDeleted.push(String(id));
-        }
-        localStorage.setItem('starboy_deleted_looks', JSON.stringify(savedDeleted));
-        localStorage.setItem('starboy_looks', JSON.stringify(updated));
-      } catch (e) {
-        console.error('Erro ao guardar excluidos:', e);
-      }
+        localStorage.removeItem('starboy_deleted_looks');
+        localStorage.removeItem('starboy_looks');
+      } catch (e) {}
 
       if (targetLook) {
-        deleteLookFromCloud(targetLook._id || targetLook.id);
+        if (targetLook.id) await deleteLookFromCloud(targetLook.id);
+        if (targetLook.number) await deleteLookFromCloud(targetLook.number);
+      } else {
+        await deleteLookFromCloud(id);
+      }
+
+      // Re-fetch from Oracle VPS Cloud Database to confirm single source of truth
+      const cloudLooks = await getCloudLooks();
+      if (cloudLooks && Array.isArray(cloudLooks)) {
+        setLooks(cloudLooks);
       }
     }
   };
