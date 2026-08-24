@@ -50,8 +50,8 @@ export default function Home({ looks, isLoading, onSelectLook }) {
           overflow: 'hidden'
         }}
       >
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-          <StarLogo size={56} color="#ffffff" className="hero-star-logo" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '16px' }}>
+          <StarLogo size={56} color="#ffffff" style={{ transform: 'translateX(3px)' }} />
         </div>
 
         <div style={{ display: 'inline-block', marginBottom: '12px' }}>
