@@ -4,7 +4,7 @@ import {
   Lock, Unlock, Check, Copy, ImageIcon, 
   Sparkles, Star 
 } from '../components/Icons';
-import { saveLookToCloud, deleteLookFromCloud } from '../services/cloudDb';
+import { saveLookToCloud, deleteLookFromCloud, getVpsUrl, setVpsUrl, syncAllLooksToVps } from '../services/cloudDb';
 
 export default function Admin({ looks, setLooks }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,6 +28,48 @@ export default function Admin({ looks, setLooks }) {
   // Meta Automation Texts Copy Feedback
   const [copiedType, setCopiedType] = useState(null);
   const [selectedAutomationLookId, setSelectedAutomationLookId] = useState(looks[0]?.id || '');
+
+  // VPS Cloud Config State
+  const [vpsInputUrl, setVpsInputUrl] = useState(() => getVpsUrl());
+  const [vpsStatus, setVpsStatus] = useState(null);
+
+  const handleSaveVpsUrl = async (e) => {
+    e?.preventDefault();
+    setVpsStatus({ type: 'testing', msg: 'Testando conexão com a VPS...' });
+    
+    const cleanUrl = vpsInputUrl.trim();
+    if (!cleanUrl) {
+      setVpsUrl('');
+      setVpsStatus({ type: 'success', msg: 'URL da VPS removida. Usando servidor de fallback.' });
+      return;
+    }
+
+    setVpsUrl(cleanUrl);
+    
+    try {
+      const targetUrl = getVpsUrl();
+      const res = await fetch(`${targetUrl}/api/health`);
+      if (res.ok) {
+        const data = await res.json();
+        setVpsStatus({ type: 'success', msg: `✓ Conectado com sucesso à VPS Oracle! (${data.service || 'API Online'})` });
+        await syncAllLooksToVps(looks);
+      } else {
+        setVpsStatus({ type: 'error', msg: `VPS respondeu com status ${res.status}. Verifique se a porta 3001 está aberta.` });
+      }
+    } catch (err) {
+      setVpsStatus({ type: 'error', msg: `Não foi possível conectar na VPS Oracle. (Erro: ${err.message})` });
+    }
+  };
+
+  const handleSyncAllVps = async () => {
+    setVpsStatus({ type: 'testing', msg: 'Enviando todos os looks para a VPS Oracle...' });
+    const success = await syncAllLooksToVps(looks);
+    if (success) {
+      setVpsStatus({ type: 'success', msg: `✓ Sucesso! ${looks.length} looks gravados na nuvem da sua VPS Oracle!` });
+    } else {
+      setVpsStatus({ type: 'error', msg: 'Erro ao enviar dados para a VPS Oracle. Verifique se o servidor está online.' });
+    }
+  };
 
   // Handle PIN Login (Admin Password: "Ic@ro1996")
   const handleLogin = (e) => {
@@ -408,11 +450,71 @@ export default function Admin({ looks, setLooks }) {
             <span>EXPORTAR BACKUP JSON</span>
           </button>
 
-          <button onClick={() => setIsAuthenticated(false)} className="y2k-btn-secondary">
-            <Lock size={14} />
-            <span>SAIR</span>
-          </button>
         </div>
+      </div>
+
+      {/* VPS Oracle Cloud Connection Card */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border-light)',
+        padding: '20px 24px',
+        marginBottom: '32px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sparkles size={18} color="#4ade80" />
+            <h3 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: '#ffffff', margin: 0 }}>
+              CONEXÃO COM SERVIDOR VPS ORACLE (BANCO DE DADOS NA NUVEM)
+            </h3>
+          </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            Status: {getVpsUrl() ? '🟢 VPS Configurada' : '🟡 Usando Servidor Padrao'}
+          </span>
+        </div>
+
+        <form onSubmit={handleSaveVpsUrl} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <input 
+            type="text"
+            placeholder="Ex: http://129.146.12.34:3001 ou https://sua-vps.com"
+            value={vpsInputUrl}
+            onChange={(e) => setVpsInputUrl(e.target.value)}
+            style={{
+              flex: 1,
+              minWidth: '260px',
+              padding: '10px 14px',
+              background: 'rgba(0,0,0,0.4)',
+              border: '1px solid var(--border-light)',
+              borderRadius: 'var(--radius-md)',
+              color: '#ffffff',
+              fontSize: '0.85rem'
+            }}
+          />
+
+          <button type="submit" className="y2k-btn-secondary" style={{ fontSize: '0.8rem' }}>
+            <span>SALVAR & TESTAR CONEXÃO</span>
+          </button>
+
+          {getVpsUrl() && (
+            <button type="button" onClick={handleSyncAllVps} className="y2k-btn-secondary" style={{ fontSize: '0.8rem' }}>
+              <span>☁️ ENVIAR LOOKS PARA VPS</span>
+            </button>
+          )}
+        </form>
+
+        {vpsStatus && (
+          <div style={{
+            marginTop: '12px',
+            padding: '8px 12px',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '0.8rem',
+            background: vpsStatus.type === 'success' ? 'rgba(74, 222, 128, 0.1)' : vpsStatus.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+            border: `1px solid ${vpsStatus.type === 'success' ? '#4ade80' : vpsStatus.type === 'error' ? '#ef4444' : 'var(--border-light)'}`,
+            color: vpsStatus.type === 'success' ? '#4ade80' : vpsStatus.type === 'error' ? '#ef4444' : '#ffffff'
+          }}>
+            {vpsStatus.msg}
+          </div>
+        )}
       </div>
 
       {/* Main Form Box: Create / Edit Look */}
