@@ -1,14 +1,15 @@
 // STARBOY STREETWEAR - HYBRID REAL-TIME CLOUD DATABASE SERVICE
 // Connects directly to VPS Server, Cloud Database API, or GitHub Storage!
 
+const DEFAULT_VPS_URL = 'https://api.zapgarcom.com.br/starboy-api';
 const DEFAULT_CLOUD_URL = 'https://raw.githubusercontent.com/brandkaru/starboy-achados/main/src/data/initialData.js';
 
 export function getVpsUrl() {
   try {
-    return localStorage.getItem('starboy_vps_url') || '';
-  } catch (e) {
-    return '';
-  }
+    const saved = localStorage.getItem('starboy_vps_url');
+    if (saved !== null && saved !== '') return saved;
+  } catch (e) {}
+  return DEFAULT_VPS_URL;
 }
 
 export function setVpsUrl(url) {
@@ -18,7 +19,7 @@ export function setVpsUrl(url) {
     } else {
       let clean = url.trim();
       if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-        clean = 'http://' + clean;
+        clean = 'https://' + clean;
       }
       if (clean.endsWith('/')) clean = clean.slice(0, -1);
       localStorage.setItem('starboy_vps_url', clean);
@@ -40,7 +41,7 @@ export async function getCloudLooks() {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          console.log('✦ Live looks carregados da VPS em tempo real:', data.length);
+          console.log('✦ Live looks carregados da VPS Oracle em tempo real:', data.length);
           return data;
         }
       }
@@ -83,11 +84,11 @@ export async function saveLookToCloud(look) {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log('✦ Look salvo com sucesso na VPS:', data);
+        console.log('✦ Look salvo com sucesso na VPS Oracle:', data);
         return data;
       }
     } catch (err) {
-      console.error('Erro ao salvar na VPS:', err);
+      console.error('Erro ao salvar na VPS Oracle:', err);
     }
   }
 
@@ -106,11 +107,11 @@ export async function deleteLookFromCloud(id) {
         method: 'DELETE'
       });
       if (res.ok) {
-        console.log('✦ Look deletado com sucesso da VPS:', id);
+        console.log('✦ Look deletado com sucesso da VPS Oracle:', id);
         return true;
       }
     } catch (err) {
-      console.error('Erro ao deletar da VPS:', err);
+      console.error('Erro ao deletar da VPS Oracle:', err);
     }
   }
 
@@ -131,7 +132,7 @@ export async function syncAllLooksToVps(looks) {
     });
     return res.ok;
   } catch (err) {
-    console.error('Erro ao sincronizar todos os looks na VPS:', err);
+    console.error('Erro ao sincronizar todos os looks na VPS Oracle:', err);
     return false;
   }
 }

@@ -476,7 +476,7 @@ export default function Admin({ looks, setLooks }) {
         <form onSubmit={handleSaveVpsUrl} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           <input 
             type="text"
-            placeholder="Ex: http://129.146.12.34:3001 ou https://sua-vps.com"
+            placeholder="Ex: https://api.zapgarcom.com.br/starboy-api"
             value={vpsInputUrl}
             onChange={(e) => setVpsInputUrl(e.target.value)}
             style={{
