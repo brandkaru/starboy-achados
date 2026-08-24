@@ -28,6 +28,7 @@ export default function App() {
   });
 
   const [selectedLook, setSelectedLook] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Pure Server Single Source of Truth State
   const [looks, setLooks] = useState(() => {
@@ -90,6 +91,8 @@ export default function App() {
         }
       } catch (err) {
         console.warn('Erro ao sincronizar com a VPS Oracle:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -151,6 +154,7 @@ export default function App() {
         {currentView === 'home' && (
           <Home 
             looks={looks} 
+            isLoading={isLoading}
             onSelectLook={handleSelectLook} 
           />
         )}

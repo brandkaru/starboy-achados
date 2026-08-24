@@ -3,7 +3,7 @@ import { Search, Grid } from '../components/Icons';
 import LookCard from '../components/LookCard';
 import StarLogo from '../components/StarLogo';
 
-export default function Home({ looks, onSelectLook }) {
+export default function Home({ looks, isLoading, onSelectLook }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Sort looks: Latest created / highest look number FIRST (Top of Home Page)
@@ -47,105 +47,101 @@ export default function Home({ looks, onSelectLook }) {
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-light)',
           position: 'relative',
-          overflow: 'hidden',
-          maxWidth: '100%'
+          overflow: 'hidden'
         }}
       >
-        {/* Star Icon Centered */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-          <StarLogo size={70} color="#ffffff" className="hero-star" />
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+          <StarLogo size={56} color="#ffffff" className="hero-star-logo" />
         </div>
 
-        <div className="star-badge" style={{ marginBottom: '14px' }}>
-          ✦ SELEÇÃO EXCLUSIVA DE LOOKS ✦
+        <div style={{ display: 'inline-block', marginBottom: '12px' }}>
+          <span className="star-badge">✦ SELEÇÃO EXCLUSIVA DE LOOKS ✦</span>
         </div>
 
-        {/* Main Title */}
         <h1 
           className="hero-title"
-          style={{ 
-            fontFamily: 'var(--font-heading)', 
-            fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', 
-            fontWeight: 800,
-            letterSpacing: '1.5px',
+          style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(1.6rem, 5vw, 2.5rem)',
+            fontWeight: 900,
+            letterSpacing: '2px',
+            lineHeight: 1.1,
             color: '#ffffff',
-            textTransform: 'uppercase',
-            marginBottom: '8px',
-            lineHeight: 1.15,
-            maxWidth: '100%',
-            wordBreak: 'break-word'
+            margin: '0 auto 12px',
+            maxWidth: '800px',
+            textTransform: 'uppercase'
           }}
         >
           ENCONTRE AS PEÇAS DO SEU OUTFIT
         </h1>
 
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          maxWidth: '520px', 
-          margin: '0 auto 24px', 
-          fontSize: '0.85rem',
+        <p style={{
+          color: 'var(--text-muted)',
+          fontSize: 'clamp(0.85rem, 2.5vw, 0.95rem)',
+          maxWidth: '540px',
+          margin: '0 auto 24px',
           lineHeight: 1.5
         }}>
           Links diretos de compra na Shein para todas as peças de roupas e acessórios dos looks postados no nosso Instagram.
         </p>
 
-        {/* Search Bar Form */}
+        {/* Look Number ONLY Search Form */}
         <form 
           onSubmit={(e) => {
             e.preventDefault();
             const gridEl = document.getElementById('looks-grid-header');
             if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth' });
           }}
-          style={{ 
-            maxWidth: '480px', 
+          style={{
+            maxWidth: '480px',
             margin: '0 auto',
             position: 'relative'
           }}
         >
-          <Search 
-            size={18} 
-            color="var(--text-muted)" 
-            style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} 
-          />
-          <input 
-            type="search"
-            enterKeyHint="search"
-            placeholder="Buscar por nº do Look (ex: 1, LOOK N#1)..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 16px 12px 46px',
-              background: 'rgba(15, 15, 20, 0.9)',
-              border: '1px solid var(--border-light)',
-              borderRadius: '30px',
-              color: '#ffffff',
-              fontSize: '0.85rem',
-              outline: 'none',
-              fontFamily: 'var(--font-body)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-              transition: 'all 0.25s ease'
-            }}
-          />
-          {searchTerm && (
-            <button 
-              type="button"
-              onClick={() => setSearchTerm('')}
+          <div style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Search 
+              size={18} 
+              color="var(--text-muted)" 
               style={{
                 position: 'absolute',
-                right: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                fontSize: '0.8rem'
+                left: '16px',
+                pointerEvents: 'none',
+                zIndex: 2
+              }} 
+            />
+            <input 
+              type="search"
+              placeholder="Buscar por nº do Look (ex: 1, LOOK N#1)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              enterKeyHint="search"
+              style={{
+                width: '100%',
+                padding: '14px 16px 14px 44px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid var(--border-light)',
+                borderRadius: 'var(--radius-md)',
+                color: '#ffffff',
+                fontSize: '0.9rem',
+                fontFamily: 'var(--font-sans)',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
               }}
-            >
-              ✕ Limpar
-            </button>
-          )}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--accent-chrome)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.07)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--border-light)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.04)';
+              }}
+            />
+          </div>
         </form>
       </div>
 
@@ -169,13 +165,32 @@ export default function Home({ looks, onSelectLook }) {
             letterSpacing: '1px',
             color: '#ffffff'
           }}>
-            {searchTerm ? `RESULTADOS DA BUSCA (${filteredLooks.length})` : `TODOS OS LOOKS (${filteredLooks.length})`}
+            {isLoading ? 'CARREGANDO LOOKS... ✦' : searchTerm ? `RESULTADOS DA BUSCA (${filteredLooks.length})` : `TODOS OS LOOKS (${filteredLooks.length})`}
           </h2>
         </div>
       </div>
 
-      {/* 4:5 Grid Section */}
-      {filteredLooks.length > 0 ? (
+      {/* 4:5 Grid Section or Loading Skeleton */}
+      {isLoading ? (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gap: '14px'
+        }}>
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div 
+              key={n}
+              style={{
+                aspectRatio: '4/5',
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-light)',
+                minHeight: '220px'
+              }}
+            />
+          ))}
+        </div>
+      ) : filteredLooks.length > 0 ? (
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
